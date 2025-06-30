@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.air.mapper.FaqMapper">
+<resultMap type="kr.co.air.dtos.FaqDto" id="faqMap">
+    <id property="fIdx" column="F_IDX"/>
+    <result property="fTitle" column="F_TITLE"/>
+    <result property="fText" column="F_TEXT"/>
+    <result property="fCreatedate" column="F_CREATEDATE"/>
+    <result property="fUpdatedate" column="F_UPDATEDATE"/>
+</resultMap>
+
+<!-- FAQ입력 -->
+<insert id="newFAQData" parameterType="kr.co.air.dtos.FaqDto">
+    INSERT INTO FAQ_DATA(F_TITLE, F_TEXT)
+    VALUES
+    ( #{fTitle}, #{fText}
+    )
+</insert>
+
+<!-- FAQ 리스트 출력 -->
+<select id="findAllFAQ" parameterType="map" resultMap="faqMap">
+SELECT * FROM FAQ_DATA 
+	<where>
+		<if test="keyword != null and keyword != ''">
+		    F_TITLE LIKE CONCAT('%', #{keyword}, '%')
+	    </if>
+	</where>
+ORDER BY F_IDX DESC
+</select>
+
+<!-- FAQ 상세페이지 -->
+<select id="findFAQById" parameterType="int" resultMap="faqMap">
+SELECT * FROM FAQ_DATA WHERE F_IDX = #{fIdx}
+</select>
+
+<!-- FAQ 수정 -->
+<update id="updateFAQById" parameterType="kr.co.air.dtos.FaqDto">
+    UPDATE FAQ_DATA SET 
+    F_TITLE = #{fTitle},
+    F_TEXT = #{fText}
+    WHERE
+        F_IDX = #{fIdx}
+</update>
+
+<!-- FAQ 삭제 -->
+<delete id="deleteFAQById">
+    DELETE FROM FAQ_DATA
+    WHERE F_IDX IN
+    <foreach collection="list" item="id" open="(" separator="," close=")">
+        #{id}
+    </foreach>
+</delete>
+
+</mapper>

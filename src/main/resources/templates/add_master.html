@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>신규 관리자 등록요청</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="./css/newadmin.css">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <i class="fas fa-user-shield admin-icon"></i>
+        <span class="admin-text">신규 관리자 등록 요청</span>
+    </div>
+    <div class="form-box">
+        <form th:action="@{/admin_req}" method="post">
+            <h3 class="section-title">아이디 및 비밀번호 정보</h3>
+            
+            <div class="form-group">
+                <div class="id-row">
+                    <input type="text" id="adminIdinput" name="adminId" placeholder="사용할 아이디를 입력하세요">
+                    <button type="button" id="checkidbtn" class="check-btn">중복확인</button>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group half">
+                    <input type="password" name="adminPw" placeholder="사용할 비밀번호를 입력하세요">
+                </div>
+                <div class="form-group half">
+                    <input type="password" name="admin_pw_confirm" placeholder="비밀번호 확인">
+                </div>
+            </div>
+
+            <h3 class="section-title">관리자 기본정보 입력</h3>
+            
+            <div class="form-group">
+                <input type="text" name="adminNm" placeholder="이름을 입력하세요">
+            </div>
+            
+            <div class="form-group">
+                <input type="text" name="adminEmail" placeholder="이메일을 입력하세요">
+            </div>
+            
+            <h3 class="section-title">연락처</h3>
+            <div class="form-group">
+                <div class="phone-row">
+			        <input class="telinput" type="tel" maxlength="13" oninput="autoHyphen(this)" pattern="[0-9]{0,3}-[0-9]{3,4}-[0-9]{4}" id="tel" autocomplete="off" name="adminTel" placeholder="연락처를 입력하세요" />
+                </div>
+            </div>
+
+            <h3 class="section-title">관리자 담당부서 및 직책</h3>
+            
+            <div class="form-row">
+                <div class="form-group half">
+                    <select name="department">
+                        <option value="">담당부서를 선택하세요</option>
+                        <option value="총무">총무</option>
+                        <option value="인사">인사</option>
+                        <option value="마케팅">마케팅</option>
+                        <option value="개발">개발</option>
+                    </select>
+                </div>
+                <div class="form-group half">
+                    <select name="positionName">
+                        <option value="">직책을 선택하세요</option>
+                        <option value="사원">사원</option>
+                        <option value="대리">대리</option>
+                        <option value="과장">과장</option>
+                        <option value="차장">차장</option>
+                        <option value="부장">부장</option>
+                    </select>
+                </div>
+            </div>
+
+            <p class="info-text">
+                <i class="fas fa-exclamation-triangle"></i> 등록 신청 후 담당자가 확인 후 승인됩니다.
+            </p>
+
+            <div class="button-row">
+                <button type="submit" class="btn btn-primary">등록 신청</button>
+                <button type="button" class="btn btn-secondary" onclick="location.href='/'">등록 취소</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+//전화번호 입력 부분
+const autoHyphen = (target) => {
+    target.value = target.value
+     .replace(/[^0-9]/g, '')
+     .replace(/^(\d{0,3})(\d{0,4})(\d{0,4})$/g, "$1-$2-$3").replace(/(\-{1,2})$/g, "");
+}
+
+//-------------아이디 중복확인
+document.getElementById("checkidbtn").addEventListener("click", function() {
+	const adminId = document.getElementById("adminIdinput").value.trim();
+	if (adminId === ""){
+		alert("아이디를 먼저 입력해주세요.");
+		return;
+	}
+	fetch(`/admin/check_id?adminId=${adminId}`)
+	   .then(response => response.json())
+	   .then(data =>{
+		   if(data.checkId){
+			   alert("사용 가능한 아이디 입니다.");
+		   }else{
+			   alert("이미 사용 중이거나 사용할 수 없는 아이디입니다.");
+		   }
+	   })
+	   .catch(error => console.error("error: ",error));
+});
+
+
+
+
+
+//---------------회원가입 유효성 검사
+const frm = document.querySelector("form");
+frm.addEventListener("submit", function(event) {
+	event.preventDefault();
+	if(!checkfrm()){
+		return;
+	}
+	const frmdata = new FormData(frm);
+	
+	fetch(`/admin_req`,{
+		method: "POST",
+		body: frmdata
+	})
+	.then(response =>{
+		if(!response.ok){
+			return response.json().then(errorData =>{
+				throw new Error(errorData.message);
+			})
+		}
+		return response.json();
+	})
+	.then(data => {
+		alert(data.message);
+		window.location.href = '/login';
+	})
+	.catch(error =>{
+		alert(error.message);
+	});
+});
+
+function checkfrm() {
+	const adminId = document.querySelector("input[name='adminId']").value;
+    const adminPw = document.querySelector("input[name='adminPw']").value;
+    const adminPwConfirm = document.querySelector("input[name='admin_pw_confirm']").value;
+    const adminName = document.querySelector("input[name='adminNm']").value;
+    const adminEmail = document.querySelector("input[name='adminEmail']").value;
+    const adminTel = document.querySelector("input[name='adminTel']").value;
+    const department = document.querySelector("select[name='department']").value;
+    const positionName = document.querySelector("select[name='positionName']").value;
+    if (adminId.trim() === "") {
+        alert("아이디를 입력해주세요.");
+        document.querySelector("input[name='adminId']").focus();
+        return false;
+    }else if (adminPw.trim() === "") {
+        alert("비밀번호를 입력해주세요.");
+        document.querySelector("input[name='adminPw']").focus();
+        return false;
+    }else if (adminPwConfirm.trim() === "") {
+        alert("비밀번호 확인을 입력해주세요.");
+        document.querySelector("input[name='admin_pw_confirm']").focus();
+        return false;
+    }else if (adminPw !== adminPwConfirm) {
+        alert("비밀번호가 일치하지 않습니다.");
+        document.querySelector("input[name='admin_pw_confirm']").focus();
+        return false;
+    }else if (adminName.trim() === "") {
+        alert("이름을 입력해주세요.");
+        document.querySelector("input[name='adminNm']").focus();
+        return false;
+    }else if (adminEmail.trim() === "") {
+        alert("이메일을 입력해주세요.");
+        document.querySelector("input[name='adminEmail']").focus();
+        return false;
+    }else if (adminTel.trim() === "") {
+        alert("연락처를 입력해주세요.");
+        document.querySelector("input[name='adminTel']").focus();
+        return false;
+    }else if (department === "") {
+        alert("담당부서를 선택해주세요.");
+        document.querySelector("select[name='department']").focus();
+        return false;
+    }else if (positionName === "") {
+        alert("직책을 선택해주세요.");
+        document.querySelector("select[name='positionName']").focus();
+        return false;
+    }
+    return true;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,213 @@
+@charset "UTF-8";
+body {
+    font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    height:100%;
+    margin: 0;
+    padding: 0;
+    background-color: #2c2c2c;
+    color: #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #4a4a4a;
+    min-height: 100vh;
+    flex:1;
+}
+
+/* 콘텐츠 영역 */
+.content {
+    padding: 20px;
+}
+
+/* 설정 섹션 스타일 */
+.settings-section {
+    background-color: #3a3a3a;
+    margin-bottom: 30px;
+    border-radius: 5px;
+    border: 1px solid #555;
+}
+
+.section-header {
+    color: #fff;
+    padding: 12px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 4px 4px 0 0;
+    display: flex;
+    align-items: center;
+}
+
+.section-header::before {
+    content: "■";
+    margin-right: 8px;
+        color: #e74c3c;
+    font-size: 16px;
+    line-height: 1;
+    vertical-align: baseline;
+}
+
+.section-content {
+    padding: 20px;
+}
+
+/* 폼 스타일 */
+.form-row {
+    display: flex;
+    margin-bottom: 15px;
+    padding: 8px 0;
+    border-bottom: 1px solid #555;
+}
+
+.form-row:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.form-row-2col {
+    display: flex;
+    gap: 40px;
+}
+
+.form-col {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.form-label {
+    width: 140px;
+    font-size: 13px;
+    color: #e0e0e0;
+    flex-shrink: 0;
+}
+
+.form-input {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-input input[type="text"],
+.form-input input[type="email"],
+.form-input input[type="password"] {
+    background-color: #2a2a2a;
+    border: 1px solid #555;
+    color: #e0e0e0;
+    padding: 8px 12px;
+    border-radius: 3px;
+    font-size: 13px;
+}
+
+.form-input input[type="text"]:focus,
+.form-input input[type="email"]:focus,
+.form-input input[type="password"]:focus {
+    outline: none;
+    border-color: #ff6b6b;
+}
+
+.input-small {
+    width: 80px;
+}
+
+.input-medium {
+    width: 200px;
+}
+
+.input-large {
+    width: 240px;
+}
+
+/* 라디오 버튼 스타일 */
+.radio-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.radio-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.radio-item input[type="radio"] {
+    margin: 0;
+}
+
+.radio-item label {
+    font-size: 13px;
+    color: #e0e0e0;
+    margin: 0;
+}
+.radio-item input[type="radio"]:disabled {
+    opacity: 0.6;
+    cursor: not-allowed; /* 마우스 커서를 '불가능' 모양으로 변경 */
+}
+
+/* 비활성화된 라디오 버튼의 라벨 색상을 더 잘보이게 조정합니다. */
+.radio-item input[type="radio"]:disabled + label {
+    color: #888; /* 기본 회색보다 약간 더 진하게 설정 */
+    cursor: not-allowed;
+}
+.radio-item input[type="radio"]:checked:disabled + label {
+    color: #e74c3c; /* 선택된 항목을 강조하는 색상 (헤더의 아이콘 색상과 동일) */
+    font-weight: bold; /* 굵게 표시하여 선택된 상태임을 강조 */
+}
+
+/* 설명 텍스트 */
+.description {
+    font-size: 11px;
+    color: #999;
+    margin-left: 10px;
+}
+
+/* 단위 텍스트 */
+.unit {
+    font-size: 13px;
+    color: #ccc;
+    margin-left: 5px;
+}
+
+/* 버튼 스타일 */
+.button-group {
+    text-align: center;
+    margin-top: 30px;
+    padding: 20px 0;
+}
+
+.btn {
+    padding: 12px 25px;
+    margin: 0 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-save {
+    background-color: #8b4444;
+    color: #fff;
+}
+
+.btn-save:hover {
+    background-color: #a55555;
+}
+
+.btn-cancel {
+    background-color: #333;
+    color: #ccc;
+}
+
+.btn-cancel:hover {
+    background-color: #555;
+    color: #fff;
+}

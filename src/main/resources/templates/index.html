@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Air_K-Travel</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="./ico/favicon-32x32.png">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main_page.css}">
+</head>
+<body>
+    <header class="headercss">
+        <nav class="navcss">
+            <ol>
+                <li>
+                    <span class="logos">Air_K-Travel</span>
+                </li>
+                <li>항공예약</li>
+                <li>이벤트</li>
+                <li>서비스 안내</li>
+                <li>공지사항</li>
+                <li>고객센터</li>
+                <li><img th:src="@{/image/menu.svg}" class="menu_ico"></li>
+            </ol>
+        </nav>
+    </header>
+    <main>
+        <section class="main_view">
+        <aside class="titles">Air<em class="color1">_</em>K-Travel (항공편 예약)</aside>
+        <section class="air_search">
+        <form id="reservationForm">
+        <input type="hidden" name="userName" value="홍길동">
+            <div class="air_parts">
+                <ul class="air_pt1">
+                    <li><label class="rd"><input type="radio" name="airRsPart" value="R"  class="radio_box" checked> 왕복</label></li>
+                    <li><label class="rd"><input type="radio" name="airRsPart" value="O"  class="radio_box"> 편도</label></li>
+                    
+                    
+                </ul>
+                <ul class="air_pt2">
+                    <li>
+                    <span>출발지</span>
+                    <span>
+	                    <select class="separts" id="departureSelect" name="airDepartNm" required>
+	                        <option value="">출발지를 선택하세요</option>
+	                        <option th:each="dep : ${depart}" th:value="${dep}" th:text="${dep}"></option>
+	                    </select>
+                    </span>
+                    </li>
+                    <li><img th:src="@{/image/arrow.svg}"></li>
+                    <li>
+                    <span>목적지</span>
+                    <span>
+	                    <select class="separts" id="arrivalSelect" name="airArrivNm" required disabled>
+	                        <option value="">도착지를 선택하세요</option>
+	                    </select>
+                    </span>
+                    </li>
+                </ul>
+                <ul class="air_pt2">
+                   <li>
+	                   <span>가는날</span>
+	                   <span>
+	                   <input type="date" class="datecss" id="departDate" name="departDate" required>
+	                   </span>
+                   </li>
+                   <li><img th:src="@{/image/arrow.svg}"></li>
+                   <li>
+	                   <span>오는날</span>
+	                   <span>
+	                   <input type="date" class="datecss" id="arrivalDate" name="arrivalDate" required>
+	                   </span>
+                   </li>
+
+                </ul>
+                <ul class="air_pt2">
+                    <li>
+                    <span>좌석선택</span>
+                    <span>
+                        <select class="separts" id="seatTypeSelect" name="airSeat" required disabled>
+                            <option value="">좌석을 선택하세요</option>
+                        </select>
+                    </span>
+                    </li>
+                    <li></li>
+                    <li>
+                    <span>프로모션 코드</span>
+                    <span>
+                        <input type="text" class="datecss" placeholder="프로모션 코드가 있을 경우 입력하세요" maxlength="12">
+                    </span>
+                    </li>
+                </ul>
+                <div class="part_titles">인원 선택</div>
+                <div class="discount-info">
+                    <p>소아는 30%, 유아는 50% 할인됩니다.</p>
+                </div>
+                <ul class="air_pt3">
+                        <li>성인 : <input type="number" class="persons" name="adult" min="0" value="0" required></li>
+                        <li>소아 : <input type="number" class="persons" name="child" min="0" value="0" required></li>
+                        <li>유아 : <input type="number" class="persons" name="infant" min="0" value="0" required></li>
+                        <li>총인원 : <em class="totals" id="totalPersons">0</em>명</li>
+                </ul>
+                <div class="btn" id="submitbtn">항공편 예약</div>
+            </div>
+            </form>
+        </section>
+        </section>
+    </main>
+    <div th:replace="admin_footer :: footer"></div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 출발지 선택 시 도착지 목록 동적 로드
+            document.getElementById('departureSelect').addEventListener('change', function() {
+                const arrivalSelect = document.getElementById('arrivalSelect');
+                arrivalSelect.innerHTML = '<option value="">도착지를 선택하세요</option>'; // 옵션 초기화
+                arrivalSelect.disabled = true;
+
+                if (this.value) {
+                    fetch(`/api/resv/arrival?depart=${this.value}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            data.forEach(arrival => {
+                                arrivalSelect.add(new Option(arrival, arrival));
+                            });
+                            arrivalSelect.disabled = false;
+                        });
+                }
+            });
+            
+            //좌석 형태 로직
+            document.getElementById('arrivalSelect').addEventListener('change', function() {
+                const departureValue = document.getElementById('departureSelect').value;
+                const arrivalValue = this.value;
+                const seatTypeSelect = document.getElementById('seatTypeSelect');
+                
+                seatTypeSelect.innerHTML = '<option value="">좌석을 선택하세요</option>';
+                seatTypeSelect.disabled = true;
+                
+                if (departureValue && arrivalValue) {
+                    fetch(`/api/resv/seat-type?depart=${departureValue}&arrival=${arrivalValue}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            data.forEach(seatType => {
+                                seatTypeSelect.add(new Option(seatType, seatType));
+                            });
+                            seatTypeSelect.disabled = false;
+                        })
+                        .catch(error => {
+                            console.error('좌석 타입 조회 실패:', error);
+                        });
+                }
+            });
+
+
+            // 날짜 제어 로직
+            const departDateInput = document.getElementById('departDate');
+            const arrivalDateInput = document.getElementById('arrivalDate');
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            departDateInput.min = tomorrow.toISOString().split('T')[0];
+            departDateInput.addEventListener('change', function() {
+                const nextDay = new Date(this.value);
+                nextDay.setDate(nextDay.getDate() + 1);
+                arrivalDateInput.min = nextDay.toISOString().split('T')[0];
+            });
+
+            // 왕복/편도 제어 로직
+            document.querySelectorAll('input[name="airRsPart"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const isOneway = this.value === 'O';
+                    arrivalDateInput.disabled = isOneway;
+                    arrivalDateInput.required = !isOneway;
+                    if (isOneway) arrivalDateInput.value = '';
+                });
+            });
+
+            // 인원수 합산 로직
+            const personInputs = document.querySelectorAll('.persons');
+            const totalPersonsSpan = document.getElementById('totalPersons');
+            const updateTotal = () => {
+                let total = 0;
+                personInputs.forEach(input => total += parseInt(input.value, 10) || 0);
+                totalPersonsSpan.textContent = total;
+            };
+            personInputs.forEach(input => input.addEventListener('input', updateTotal));
+
+            // 예약 버튼 클릭 로직
+            document.getElementById('submitbtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                const reservationForm = document.getElementById('reservationForm');
+                const formData = new FormData(reservationForm);
+                const data = Object.fromEntries(formData.entries());
+
+                data.adult = parseInt(data.adult);
+                data.child = parseInt(data.child);
+                data.infant = parseInt(data.infant);
+                if (data.adult + data.child + data.infant === 0) {
+                    alert('인원은 1명 이상 선택해야 합니다.');
+                    return;
+                }
+                if (data.airRsPart === 'O') {
+                    delete data.arrivalDate;
+                }
+
+                // [수정] API 경로를 새로운 컨트롤러에 맞게 변경
+                fetch('/api/resv/create', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    if (!response.ok) return response.text().then(text => Promise.reject(new Error(text)));
+                    return response.text();
+                })
+                .then(message => {
+                    alert(message);
+                    reservationForm.reset();
+                    updateTotal();
+                })
+                .catch(error => alert('예약 실패: ' + error.message));
+            });
+        });
+    </script>
+</body>
+</html>

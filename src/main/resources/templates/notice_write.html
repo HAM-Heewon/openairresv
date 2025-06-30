@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>공지사항 등록</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" type="text/css" th:href="@{/css/head_menu.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/css/notice_write.css}">
+
+</head>
+<body>
+<div class="container">
+    <div th:replace="admin_header :: header"></div>
+    
+    <div th:replace="admin_menu :: menu"></div>
+    
+    <!-- 메인 콘텐츠 -->
+    <div class="content">
+        <h2 class="section-title">공지사항 등록페이지</h2>
+        
+        <!-- 등록 폼 -->
+        <form method="post" th:action="@{/notice_save}" th:object="${newNotice}" enctype="multipart/form-data">
+            <div class="form-container">
+                <table class="form-table">
+                    <tr>
+                        <th>공지사항 여부</th>
+                        <td>
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="isNotice" name="isNotice" value="true">
+                                <label for="isNotice">공지 출력 ※ 공지출력을 체크할 시 해당 공지사항은 최상단에 노출됩니다.</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>공지사항 제목</th>
+                        <td>
+                            <input type="text" th:field="*{eTitle}" class="form-input title-input" placeholder="제목을 입력하세요">
+                            <span class="char-count">※ 최대 150자까지 입력이 가능</span>
+                        </td>
+                    </tr>
+                    <tr>    
+                        <th>글쓴이</th>
+                        <td>
+                            <input type="text" th:field="*{ename}" class="form-input" readonly>
+                            <span class="file-info">※ 관리자 이름이 노출 됩니다.</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>첨부파일</th>
+                        <td>
+                            <div class="file-container">
+                                <input type="file" name="mFile" class="file-input">
+                                <span class="file-info">※ 첨부파일 최대 용량은 2MB 입니다.</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>공지내용</th>
+                        <td>
+                            <textarea th:field="*{esubject}" class="form-textarea" placeholder="공지내용을 입력하세요"></textarea>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- 버튼 그룹 -->
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary" onclick="return newRegist()">공지등록</button>
+                <button type="button" class="btn btn-secondary" onclick="location.href='/notice'">공지목록</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div th:replace="admin_footer :: footer"></div>
+
+<script>
+// 메뉴 활성화 스크립트
+document.addEventListener('DOMContentLoaded', function() {
+    const currentPath = window.location.pathname;
+    const menuItems = document.querySelectorAll('.menu-item');
+    
+    // 모든 메뉴에서 active 클래스 제거
+    menuItems.forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // 항공편 관리 메뉴 활성화
+    if (currentPath.includes('notice')) {
+	    menuItems.forEach(item => {
+	        const href = item.getAttribute('href');
+	        if (href.includes('notice')) {
+	            item.classList.add('active');
+	        }
+	    });
+    }
+    
+ // 제목 글자수 체크
+    document.querySelector('input[name="eTitle"]').addEventListener('input', function() {
+        const maxLength = 100;
+        const currentLength = this.value.length;
+        const charCountElement = this.parentNode.querySelector('.char-count');
+        
+        if (currentLength > maxLength) {
+            this.value = this.value.substring(0, maxLength);
+            charCountElement.textContent = `※ 최대 100자까지 입력이 가능 (${maxLength}/${maxLength})`;
+            charCountElement.style.color = '#e74c3c';
+        } else {
+            charCountElement.textContent = `※ 최대 100자까지 입력이 가능 (${currentLength}/${maxLength})`;
+            charCountElement.style.color = currentLength > 90 ? '#e74c3c' : '#666';
+        }
+    });
+
+    // 파일 크기 체크
+    document.querySelector('input[type="file"]').addEventListener('change', function() {
+        const file = this.files[0];
+        const maxSize = 2 * 1024 * 1024; // 2MB
+        
+        if (file && file.size > maxSize) {
+            alert('파일 크기는 2MB를 초과할 수 없습니다.');
+            this.value = '';
+        }
+    });
+});
+
+// 공지 등록 유효성 검사
+function newRegist() {
+    const titleInput = document.querySelector('input[name="eTitle"]');
+    const contentTextarea = document.querySelector('textarea[name="esubject"]');
+    const title = titleInput ? titleInput.value.trim() : '';
+    const content = contentTextarea ? contentTextarea.value.trim() : '';
+
+    if (!title) {
+        alert('공지사항 제목을 입력해주세요.');
+        if (titleInput) titleInput.focus();
+        return false;
+    }
+    if (!content) {
+        alert('공지내용을 입력해주세요.');
+        if (contentTextarea) contentTextarea.focus();
+        return false; 
+    }
+    if (title.length > 100) {
+        alert('제목은 100자 이하로 입력해주세요.');
+        if (titleInput) titleInput.focus();
+        return false;
+    }
+    const confirmResult = confirm('공지사항을 등록하시겠습니까?');
+    if (!confirmResult) {
+        return false;
+    }
+    return true; 
+}
+
+
+</script>
+</body>
+</html>

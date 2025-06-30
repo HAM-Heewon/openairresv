@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>예매 리스트</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" type="text/css" th:href="@{/css/head_menu.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/css/ticketing_list.css}">
+</head>
+<body>
+<div class="container">
+  
+      <div th:replace="admin_header :: header"></div>
+   
+      <div th:replace="admin_menu :: menu"></div>
+      <div class="content">
+          <h2 class="section-title">예매 리스트</h2>
+          
+          <div class="search-section">
+              <div class="search-form">
+                  <select class="search-select" id="searchType">
+                      <option value="userName">고객명</option>
+                  </select>
+                  <input type="text" class="search-input" id="searchKeyword" placeholder="검색할 단어를 입력하세요">
+                  <button type="submit" class="btn-search" onclick="searchReservations()">검색</button>
+              </div>
+          </div>
+          
+          <div class="table-container">
+              <table class="data-table">
+                  <thead>
+                      <tr>
+                          <th style="width: 50px;">
+                              <input type="checkbox" class="checkbox" id="selectAll">
+                          </th>
+                          <th style="width: 100px;">공항코드</th>
+                          <th style="width: 150px;">항공사명</th>
+                          <th style="width: 100px;">항공코드</th>
+                          <th style="width: 80px;">출발지</th>
+                          <th style="width: 80px;">도착지</th>
+                          <th style="width: 100px;">좌석형태</th>
+                          <th style="width: 80px;">고객명</th>
+                          <th style="width: 80px;">연락처</th> 
+                          <th style="width: 100px;">예약일</th>
+                          <th style="width: 80px;">인원수</th>
+                          <th style="width: 120px;">결제금액</th>
+                      </tr>
+                  </thead>
+                  <tbody id="dataTableBody">
+                      <tr th:if="${#lists.isEmpty(reservations)}">
+                          <td colspan="14" class="no-data">예매 하신 사용자 또는 검색하신 내용이 없습니다.</td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
+          
+          <div class="bottom-actions">
+              <button type="button" class="btn-cancel" onclick="resv_cancel()">예매취소</button>
+          </div>
+      </div>
+  </div>
+<div th:replace="admin_footer :: footer"></div>
+
+<script>
+// 메뉴 활성화 스크립트 (기존 유지)
+document.addEventListener('DOMContentLoaded', function() {
+    const currentPath = window.location.pathname;
+    const menuItems = document.querySelectorAll('.menu-item');
+    
+    menuItems.forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    menuItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href === '/ticketing_list' || href.includes('ticketing')) {
+            item.classList.add('active');
+        }
+    });
+    
+    // 체크박스 이벤트 (기존 유지)
+    document.getElementById('selectAll').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.row-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+    });
+
+    document.getElementById('searchKeyword').addEventListener('keyup', function(event) {
+        // 엔터 키 (keyCode 13 또는 event.key === 'Enter')가 눌렸는지 확인
+        if (event.key === 'Enter' || event.keyCode === 13) {
+            searchReservations(); // 검색 함수 호출
+        }
+    });
+    
+    // 페이지 로드 시 모든 예매 데이터 조회
+    searchReservations(); 
+});
+   
+// 검색 기능을 위한 함수
+function searchReservations() {
+    const searchType = document.getElementById('searchType').value;
+    const searchKeyword = document.getElementById('searchKeyword').value.trim();
+    
+    // API 엔드포인트는 /ticket/list로 그대로 사용하고, JSON을 반환하도록 Controller 수정
+    fetch(`/ticket/search-api?searchType=${searchType}&searchKeyword=${encodeURIComponent(searchKeyword)}`)
+        .then(response => {
+            if (!response.ok) {
+                // HTTP 오류 응답 처리
+                return response.text().then(text => { throw new Error(text) });
+            }
+            return response.json(); // JSON 응답 파싱
+        })
+        .then(data => {
+            updateTable(data); // 검색 결과로 테이블 업데이트
+        })
+        .catch(error => {
+            console.error('검색 실패:', error);
+            alert('검색에 실패했습니다: ' + error.message);
+        });
+}
+
+// 테이블 내용을 업데이트하는 함수
+function updateTable(reservations) {
+    const dataTableBody = document.getElementById('dataTableBody');
+    dataTableBody.innerHTML = ''; // 기존 내용 지우기
+
+    if (reservations && reservations.length > 0) {
+        reservations.forEach(resv => {
+            const row = `
+                <tr data-reservation-id="${resv.AIR_RSNO}">
+                    <td><input type="checkbox" class="checkbox row-checkbox" data-id="${resv.air_RSNO}"></td>
+                    <td>${resv.airport_CD || ''}</td>
+                    <td>${resv.airline_NM || ''}</td>
+                    <td>${resv.flight_CD || ''}</td>
+                    <td>${resv.air_DEPARTNM || ''}</td>
+                    <td>${resv.air_ARRIVNM || ''}</td>
+                    <td>${resv.air_SEAT || ''}</td>
+                    <td>${resv.air_USERNAME || ''}</td>
+                    <td>01012341234</td>
+                    <td>${resv.reservation_DATE || ''}</td>
+                    <td>${(resv.adult || 0) + (resv.children1 || 0) + (resv.children2 || 0)}명</td>
+                    <td>${new Intl.NumberFormat('ko-KR').format(resv.totalPrice || 0)}원</td>
+                </tr>
+            `;
+            dataTableBody.insertAdjacentHTML('beforeend', row);
+        });
+    } else {
+        const noDataRow = `
+            <tr>
+                <td colspan="14" class="no-data">예매 하신 사용자 또는 검색하신 내용이 없습니다.</td>
+            </tr>
+        `;
+        dataTableBody.insertAdjacentHTML('beforeend', noDataRow);
+    }
+}
+
+// 예매 취소 함수 (기존 유지)
+function resv_cancel() {
+    const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
+    
+    if (checkedBoxes.length === 0) {
+        alert('취소할 예매를 선택해주세요.');
+        return;
+    }
+    
+    if (!confirm(`선택된 ${checkedBoxes.length}개의 예매를 취소하시겠습니까?`)) {
+        return;
+    }
+    
+    const resvIds = Array.from(checkedBoxes).map(checkbox => parseInt(checkbox.dataset.id));
+    console.log('전송될 예약 ID:', resvIds);
+    fetch('/ticket/cancel', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(resvIds)
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => Promise.reject(new Error(text)));
+        }
+        return response.text();
+    })
+    .then(message => {
+        alert(message);
+        searchReservations(); // 취소 후 현재 검색 조건으로 테이블 새로고침
+    })
+    .catch(error => {
+        console.error('취소 실패:', error);
+        alert('예매 취소에 실패했습니다: ' + error.message);
+    });
+}
+</script>
+</body>
+</html>

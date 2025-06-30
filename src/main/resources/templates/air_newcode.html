@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>항공 코드 등록</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" type="text/css" href="./css/head_menu.css">
+<link rel="stylesheet" type="text/css" href="./css/air_newcode.css">
+</head>
+<body>
+<div class="container">
+    <div th:replace="admin_header :: header"></div>
+    
+    <div th:replace="admin_menu :: menu"></div>
+    
+    <!-- 메인 콘텐츠 -->
+    <div class="content">
+        <h2 class="section-title">항공 코드 등록 페이지</h2>
+        
+        <!-- 등록 폼 -->
+        <div class="registration-form">
+            <form id="airlineCodeForm" onsubmit="return submitForm(event)">
+                
+                <!-- 공항코드 -->
+                <div class="form-row">
+                    <div class="form-input">
+                        <label class="form-label">공항코드</label>
+                        <input type="text" class="form-text" name="airportCode" id="airportCode" placeholder="공항코드를 입력하세요">
+                        <span class="input-note">※ 공항코드는 무조건 대문자로 입력 되도록 합니다.</span>
+                    </div>
+                </div>
+                
+                <!-- 항공사명 -->
+                <div class="form-row">
+                    <div class="form-input">
+                        <label class="form-label">항공사명</label>
+                        <input type="text" class="form-text" name="airlineName" id="airlineName" placeholder="항공사명을 입력하세요">
+                        <span class="input-note">※ 항공사명은 특수문자는 입력 되지 않습니다.</span>
+                    </div>
+                </div>
+                
+                <!-- 항공편코드 -->
+                <div class="form-row">
+                    <div class="form-input">
+                        <label class="form-label">항공편코드</label>
+                        <input type="text" class="form-text" name="flightCode" id="flightCode" placeholder="항공편코드를 입력하세요">
+                        <button type="button" class="btn-duplicate" onclick="checkDuplicate()">중복확인</button>
+                        <span class="input-note">※ 항공코드는 중복 입력이 되지 않습니다.</span>
+                    </div>
+                </div>
+                
+                <!-- 항공편명 -->
+                <div class="form-row">
+                    <div class="form-input">
+                        <label class="form-label">항공편명</label>
+                        <input type="text" class="form-text" name="flightName" id="flightName" placeholder="항공편명을 입력하세요">
+                        <span class="example-text">※ 예시 Korean Air, Jeju Air, Air Busan | </span>
+                    </div>
+                </div>
+                
+                <!-- 사용 유/무 -->
+                <div class="form-row">
+                    <div class="form-input">
+                        <label class="form-label">사용 유/무</label>
+                        <div class="radio-group">
+                            <label class="radio-item">
+                                <input type="radio" name="useStatus" value="사용함" checked>
+                                <span>사용함</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="useStatus" value="사용안함">
+                                <span>사용안함</span>
+                            </label>
+                        </div>
+                        <span class="input-note">※ 사용안함으로 설정하게 되면 항공편 등록시 해당 항공코드가 출력 되지 않습니다.</span>
+                    </div>
+                </div>
+                
+            </form>
+        </div>
+        
+        <!-- 버튼 그룹 -->
+        <div class="button-group">
+            <button type="button" class="btn btn-list" onclick="location.href='/code_list'">항공 코드 리스트</button>
+            <button type="button" class="btn btn-register" onclick="submitForm(event)">항공 코드 생성</button>
+        </div>
+    </div>
+</div>
+<div th:replace="admin_footer :: footer"></div>
+<script>
+// 메뉴 활성화 스크립트
+document.addEventListener('DOMContentLoaded', function() {
+    const currentPath = window.location.pathname;
+    const menuItems = document.querySelectorAll('.menu-item');
+    
+    // 모든 메뉴에서 active 클래스 제거
+    menuItems.forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // 항공편 관리 메뉴 활성화
+    if (currentPath.includes('code')) {
+        menuItems.forEach(item => {
+            const href = item.getAttribute('href');
+            if (href.includes('code')) {
+                item.classList.add('active');
+            }
+        });
+    }
+});
+
+// 공항코드 대문자 변환
+document.getElementById('airportCode').addEventListener('input', function() {
+    this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '');
+});
+
+// 항공사명 특수문자 제거
+document.getElementById('airlineName').addEventListener('input', function(e) {
+    // 조합 중인 문자는 처리하지 않음
+    if (e.isComposing) return;
+    this.value = this.value.replace(/[^a-zA-Z0-9가-힣\s]/g, '');
+});
+
+document.getElementById('airlineName').addEventListener('compositionend', function() {
+    this.value = this.value.replace(/[^a-zA-Z0-9가-힣\s]/g, '');
+});
+
+// 항공편코드 영문 숫자만 허용
+document.getElementById('flightCode').addEventListener('input', function() {
+    this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+});
+
+// 중복 확인
+function checkDuplicate() {
+	const flightCodeInput = document.getElementById('flightCode');
+    const flightCode = flightCodeInput.value.trim();
+    
+    if (!flightCode) {
+        alert('항공편코드를 먼저 입력해주세요.');
+        flightCodeInput.focus();
+        return;
+    }
+    
+    // fetch API를 사용하여 서버에 중복 검사 요청
+    fetch(`/air-codes/check?flightCode=${flightCode}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.isDuplicate) {
+                alert('이미 존재하는 항공편코드입니다. 다른 코드를 입력해주세요.');
+                flightCodeInput.focus();
+            } else {
+                alert('사용 가능한 항공편코드입니다.');
+            }
+        })
+        .catch(error => {
+            console.error('중복 확인 중 오류 발생:', error);
+            alert('중복 확인 중 오류가 발생했습니다. 다시 시도해 주세요.');
+        });
+}
+
+// 폼 제출 처리
+function submitForm(event) {
+    if (event) {
+        event.preventDefault();
+    }
+    
+    // 유효성 검사
+    const airportCode = document.getElementById('airportCode').value.trim();
+    const airlineName = document.getElementById('airlineName').value.trim();
+    const flightCode = document.getElementById('flightCode').value.trim();
+    const flightName = document.getElementById('flightName').value.trim();
+    
+    if (!airportCode) {
+        alert('공항코드를 입력해주세요.');
+        document.getElementById('airportCode').focus();
+        return false;
+    }
+    if (!airlineName) {
+        alert('항공사명을 입력해주세요.');
+        document.getElementById('airlineName').focus();
+        return false;
+    }
+    if (!flightCode) {
+        alert('항공편코드를 입력해주세요.');
+        document.getElementById('flightCode').focus();
+        return false;
+    }
+    if (!flightName) {
+        alert('항공편명을 입력해주세요.');
+        document.getElementById('flightName').focus();
+        return false;
+    }
+    const formData = {
+            airportCode: airportCode,
+            airlineName: airlineName,
+            flightCode: flightCode,
+            flightName: flightName,
+            useStatus: document.querySelector('input[name="useStatus"]:checked').value
+        };
+    
+    if (confirm('항공 코드를 생성하시겠습니까?')) {
+        // fetch API를 사용하여 서버에 항공 코드 생성 요청
+        fetch('/air-codes', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                // 서버에서 실패 응답을 보냈을 경우
+                return response.text().then(text => { throw new Error(text) });
+            }
+            // 성공 응답일 경우
+            return response.text();
+        })
+        .then(successMessage => {
+            alert(successMessage);
+
+            // 성공 시 항공 코드 리스트 페이지로 이동 (기존에는 product_list였으나, code_list로 추정하여 변경)
+            location.href = '/code_list'; 
+        })
+        .catch(error => {
+            console.error('항공 코드 생성 중 오류 발생:', error);
+            alert(error.message || '항공 코드 생성 중 오류가 발생했습니다.');
+        });
+    }
+    
+    return false;
+}
+</script>
+</body>
+</html>

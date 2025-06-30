@@ -1,0 +1,257 @@
+@charset "UTF-8";
+/* 항공 코드 등록 페이지 스타일 */
+body {
+    font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #2c2c2c;
+    color: #e0e0e0;
+        display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+	width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #2c2c2c;
+        flex:1;
+}
+
+.content {
+    padding: 0;
+    background: #2c2c2c;
+}
+
+.section-title {
+    color: white;
+    padding: 8px 15px;
+    margin: 0;
+    margin-top: 1em;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 0;
+    
+}
+
+.section-title::before {
+    content: "■ ";
+    margin-right: 5px;
+    color: #e74c3c;
+    font-size: 16px;
+    line-height: 1;
+    vertical-align: baseline;
+}
+
+.registration-form {
+    background: #3a3a3a;
+    padding: 20px;
+    border-bottom: 1px solid #555;
+}
+
+.form-row {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 0.5em;
+}
+
+.form-row:last-child {
+    margin-bottom: 0;
+}
+
+.form-label {
+    width: 120px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #e0e0e0;
+    background: #8b6f6f;
+    padding: 10px 15px;
+    margin-right: 20px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    min-height: 20px;
+}
+
+.form-input {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.form-text {
+    padding: 8px 12px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background: #2c2c2c;
+    color: #e0e0e0;
+    font-size: 14px;
+    width: 300px;
+    height: 40px;
+    box-sizing: border-box;
+}
+
+.form-text:focus {
+    outline: none;
+    border-color: #8b4444;
+    box-shadow: 0 0 5px rgba(139, 68, 68, 0.3);
+}
+
+.btn-duplicate {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    background: #6c5ce7;
+    color: white;
+    cursor: pointer;
+    font-size: 13px;
+    box-sizing: border-box;
+}
+
+.btn-duplicate:hover {
+    background: #5b4ec7;
+}
+
+.radio-group {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.radio-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.radio-item input[type="radio"] {
+    accent-color: #8b4444;
+}
+
+.radio-item span {
+    font-size: 14px;
+    color: #e0e0e0;
+}
+
+.input-note {
+    font-size: 12px;
+    color: #999;
+    margin-left: 10px;
+}
+
+.example-text {
+    font-size: 12px;
+    color: #999;
+    margin-left: 10px;
+}
+
+.example-text::after {
+    content: " 예시 사이트";
+    color: #e74c3c;
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: #3a3a3a;
+    border-top: 1px solid #555;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+}
+.btn-update{
+    background: #8b4444;
+    color: white;	
+}
+.btn-update:hover{
+	background: #a04545;
+}
+
+
+.btn-list {
+    background: #2c2c2c;
+    color: #e0e0e0;
+    border: 1px solid #555;
+}
+
+.btn-list:hover {
+    background: #444;
+}
+
+.btn-register, .btn-delete {
+    background: #6c5ce7;
+    color: white;
+}
+
+.btn-register:hover, .btn-delete:hover {
+    background: #5b4ec7;
+}
+
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .form-label {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+    
+    .form-input {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .form-text {
+        width: 100%;
+    }
+    
+    .radio-group {
+        justify-content: flex-start;
+    }
+    
+    .button-group {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+    
+    .btn {
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+    
+    .input-note,
+    .example-text {
+        margin-left: 0;
+    }
+    
+    .warning-text {
+        margin-left: 0;
+        text-align: center;
+        width: 100%;
+    }
+}

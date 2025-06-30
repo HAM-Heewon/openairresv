@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>공지사항 상세</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" type="text/css" th:href="@{/css/head_menu.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/css/notice_view.css}">
+</head>
+<body>
+<div class="container">
+    <div th:replace="admin_header :: header"></div>
+    
+    <div th:replace="admin_menu :: menu"></div>
+    
+    <!-- 메인 콘텐츠 -->
+    <div class="content" th:if="${notice != null}" th:object="${notice}">
+        <h2 class="section-title">공지사항 VIEW 페이지</h2>
+        <!-- 공지사항 상세 정보 -->
+        <div class="view-container">
+            <table class="view-table">
+                <tr>
+                    <th>공지번호</th>
+                    <td><span class="notice-number" th:text="*{eno}"></span> 번째 공지글</td>
+                </tr>
+                <tr>
+                    <th>공지사항 여부</th>
+                    <td class="checkbox-container">
+                        <input type="checkbox" id="isNotice" disabled>
+                        <label for="isNotice">공지 출력 ※ 공지출력을 해지할 시 해당 글 내용은 최상단에 노출 되어 집니다.</label>
+                    </td>
+                </tr>
+                <tr>
+                    <th>공지사항 제목</th>
+                    <td th:text="*{eTitle}">공지사항 제목 출력</td>
+                </tr>
+                <tr>
+                    <th>글쓴이</th>
+                    <td th:text="*{ename}">관리자</td>
+                </tr>
+                <th:block th:if="*{fileName != null}">
+                    <tr>
+                        <th>첨부파일</th>
+                        <td>
+                            <a href="#" th:href="@{/download/{fileSavename}(fileSavename=*{fileSavename})}" th:text="*{fileName}">
+                                첨부파일.zip
+                            </a>
+                        </td>
+                    </tr>
+                </th:block>
+                <th:block th:unless="*{fileName != null}">
+                    <tr>
+                        <th>첨부파일</th>
+                        <td>첨부파일이 없습니다.</td>
+                    </tr>
+                </th:block>
+                <tr>
+                    <th>공지내용</th>
+                    <td>
+                        <div class="content-area" th:text="*{esubject}">
+                            공지내용 출력 부분
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
+        <!-- 버튼 그룹 -->
+        <div class="button-group">
+        <button type="button" class="btn btn-secondary" onclick="location.href='/notice'">공지목록</button>
+            <button type="button" class="btn btn-primary" th:onclick="|location.href='@{/notice_update/{eno}(eno=*{eno})}'|">공지수정</button>
+            <button type="button" class="btn btn-danger" th:onclick="|deleteNotice(*{eno})|">공지삭제</button>
+        </div>
+    </div>
+</div>
+<div th:replace="admin_footer :: footer"></div>
+
+<script>
+// 메뉴 활성화 스크립트
+document.addEventListener('DOMContentLoaded', function() {
+    const currentPath = window.location.pathname;
+    const menuItems = document.querySelectorAll('.menu-item');
+    
+    // 모든 메뉴에서 active 클래스 제거
+    menuItems.forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // 항공편 관리 메뉴 활성화
+    if (currentPath.includes('notice')) {
+    menuItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href.includes('notice')) {
+            item.classList.add('active');
+        }
+    });
+    }
+});
+
+// 공지사항 삭제 함수
+function deleteNotice(eno) {
+    if (confirm(eno + '번 공지사항을 정말로 삭제하시겠습니까?')) {
+        
+        fetch('/notice/delete/' + eno, {
+            method: 'DELETE',
+        })
+        .then(response => {
+            if (!response.ok) {
+                // 서버에서 에러 메시지를 보냈을 경우
+                return response.text().then(text => {
+                    console.error("서버 응답 오류:", text); // 콘솔에 오류 내용 출력
+                    throw new Error(text);
+                });
+            }
+            // 성공적으로 삭제되었을 경우, 서버에서 보낸 메시지를 받음
+            return response.text(); // 서버는 이제 메시지를 반환합니다.
+        })
+        .then(data => {
+            // data 변수에 서버에서 보낸 성공 메시지 ("X번 공지사항이 삭제되었습니다.")가 담깁니다.
+            alert(data); // 성공 메시지를 alert로 출력
+            location.href = '/notice'; // 메시지 확인 후 /notice 페이지로 이동
+        })
+        .catch(error => {
+            console.error("Fetch 오류:", error); // 콘솔에 fetch 오류 출력
+            alert(error.message); // 실패 메시지 출력
+        });
+    }
+}
+</script>
+</body>
+</html>

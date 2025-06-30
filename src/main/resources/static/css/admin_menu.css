@@ -1,0 +1,55 @@
+@charset "UTF-8";
+.menu {
+    background-color: #333 !important;
+    padding: 0 !important;
+    display: flex !important;
+    justify-content: space-around !important;
+    margin: 0 !important;
+    border: none !important;
+    
+}
+
+.menu .menu-item {
+    flex: 1 !important;
+    text-align: center !important;
+    padding: 15px 10px !important;
+    color: #ccc !important;
+    text-decoration: none !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    border-right: 1px solid #555 !important;
+    transition: background-color 0.3s ease !important;
+    background-color: transparent !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    display: block !important;
+}
+
+.menu .menu-item:last-child {
+    border-right: none !important;
+}
+
+.menu .menu-item:hover {
+    background-color: #555 !important;
+    color: #fff !important;
+}
+
+.menu .menu-item.active {
+    background-color: #8b4444 !important;
+    color: #fff !important;
+}
+
+/* 추가: 링크 기본 스타일 초기화 */
+.menu a {
+    color: inherit !important;
+    text-decoration: none !important;
+}
+
+.menu a:visited {
+    color: inherit !important;
+}
+
+.menu a:focus {
+    outline: none !important;
+}

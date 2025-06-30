@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.air.mapper.ReservationMapper">
+
+<!-- 운행 가능한 출발지 목록 조회 -->
+<select id="findAvailableDepartures" resultType="string">
+    SELECT DISTINCT fs.DEPARTURE_NM
+    FROM FLIGHT_SCHEDULES fs
+    JOIN FLIGHT_RESV_INFO fri ON fs.SCHEDULE_IDX = fri.SCHEDULE_IDX
+    WHERE fs.FLIGHT_STATUS = '운행가능'
+      AND CURDATE() BETWEEN fri.BOOKING_START_DATE AND fri.BOOKING_END_DATE
+    ORDER BY fs.DEPARTURE_NM
+</select>
+
+<!-- 특정 출발지에 대해 운행 가능한 도착지 목록 조회 -->
+<select id="findAvailableArrivals" parameterType="string" resultType="string">
+    SELECT DISTINCT fs.ARRIVAL_NM
+    FROM FLIGHT_SCHEDULES fs
+    JOIN FLIGHT_RESV_INFO fri ON fs.SCHEDULE_IDX = fri.SCHEDULE_IDX
+    WHERE fs.DEPARTURE_NM = #{departure}
+      AND fs.FLIGHT_STATUS = '운행가능'
+      AND CURDATE() BETWEEN fri.BOOKING_START_DATE AND fri.BOOKING_END_DATE
+    ORDER BY fs.ARRIVAL_NM
+</select>
+
+<!-- 예약 가능한 좌석 타입 목록 조회 -->
+<select id="findAvailableSeatTypes" resultType="string">
+    SELECT DISTINCT fst.SEAT_TYPE_NM
+    FROM FLIGHT_SEAT_TYPES fst
+    JOIN FLIGHT_SCHEDULES fs ON fst.SCHEDULE_IDX = fs.SCHEDULE_IDX
+    WHERE fs.DEPARTURE_NM = #{departure}
+    AND fs.ARRIVAL_NM = #{arrival}
+    AND fs.FLIGHT_STATUS = '운행가능'
+    ORDER BY fst.SEAT_TYPE_NM
+</select>
+
+<!-- [수정] parameterType을 클라이언트 요청 DTO인 ReservationRequest로 변경 -->
+<select id="findPriceInfo" parameterType="kr.co.air.dtos.ReservationRequestDto" resultType="kr.co.air.dtos.ResvSettingDto">
+    SELECT
+        fri.PRICE_PER_PERSON as pricePerPerson,
+        fri.BOOKING_START_DATE as bookingStartDate,
+        fri.BOOKING_END_DATE as bookingEndDate
+    FROM FLIGHT_RESV_INFO fri
+    JOIN FLIGHT_SCHEDULES fs ON fri.SCHEDULE_IDX = fs.SCHEDULE_IDX
+    JOIN FLIGHT_SEAT_TYPES fst ON fri.SEAT_TYPE_IDX = fst.SEAT_TYPE_IDX
+    WHERE fs.DEPARTURE_NM = #{airDepartNm}
+      AND fs.ARRIVAL_NM = #{airArrivNm}
+      AND fst.SEAT_TYPE_NM = #{airSeat}
+      AND fs.FLIGHT_STATUS = '운행가능'
+</select>
+
+<!-- [수정] parameterType을 DB 저장용 DTO인 ResvDto로 변경하고, 필드명도 대문자로 수정 -->
+<insert id="saveReservation" parameterType="kr.co.air.dtos.ResvDto">
+    INSERT INTO AIR_RESERVATION (
+        AIR_RSPART, AIR_DEPARTNM, AIR_ARRIVNM, DEPART_DATE, ARRIVAL_DATE,
+        AIR_SEAT, P_CODE, ADULT, CHILDREN1, CHILDREN2, TOTAL_PRICE, AIR_USERNAME, RESERVATION_DATE
+    ) VALUES (
+        #{AIR_RSPART}, #{AIR_DEPARTNM}, #{AIR_ARRIVNM}, #{DEPART_DATE}, #{ARRIVAL_DATE},
+        #{AIR_SEAT}, #{P_CODE}, #{ADULT}, #{CHILDREN1}, #{CHILDREN2}, #{totalPrice}, #{AIR_USERNAME}, CURRENT_DATE
+    )
+</insert>
+
+    
+</mapper>

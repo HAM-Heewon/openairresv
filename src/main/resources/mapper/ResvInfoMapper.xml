@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.air.mapper.ResvInfoMapper">
+
+<!-- [수정된 부분] 1:N 관계를 매핑하기 위한 최종 resultMap -->
+<resultMap id="resvGroupResultMap" type="kr.co.air.dtos.ResvGroupDto">
+    <!-- 항공편 정보 (1에 해당) -->
+    <id property="scheduleIdx" column="SCHEDULE_IDX"/>
+    <result property="airportCd" column="AIRPORT_CD"/>
+    <result property="airlineNm" column="AIRLINE_NM"/>
+    <result property="flightCd" column="FLIGHT_CD"/>
+    <result property="flightNm" column="FLIGHT_NM"/>
+    <result property="departureNm" column="DEPARTURE_NM"/>
+    <result property="arrivalNm" column="ARRIVAL_NM"/>
+    
+    <!-- 좌석 목록 정보 (N에 해당) -->
+    <collection property="seatSettings" ofType="kr.co.air.dtos.ResvSettingDto">
+        <id property="seatTypeIdx" column="SEAT_TYPE_IDX"/>
+        <result property="seatTypeName" column="SEAT_TYPE_NM"/>
+        <result property="seatCount" column="SEAT_COUNT"/>
+        <result property="seatTypePrice" column="SEAT_TYPE_PRICE"/>
+        <result property="bookingStartDate" column="BOOKING_START_DATE"/>
+        <result property="bookingEndDate" column="BOOKING_END_DATE"/>
+        <result property="pricePerPerson" column="PRICE_PER_PERSON"/>
+    </collection>
+</resultMap>
+
+<!-- [수정된 부분] 새로운 resultMap을 사용하도록 변경 -->
+<select id="findFlightSettings" parameterType="map" resultMap="resvGroupResultMap">
+    SELECT
+        fs.SCHEDULE_IDX, fs.AIRPORT_CD, fs.AIRLINE_NM, fs.FLIGHT_CD, fs.FLIGHT_NM, fs.DEPARTURE_NM, fs.ARRIVAL_NM,
+        fst.SEAT_TYPE_IDX, fst.SEAT_TYPE_NM, fst.SEAT_COUNT,
+        fri.BOOKING_START_DATE, fri.BOOKING_END_DATE, fst.SEAT_TYPE_PRICE
+    FROM FLIGHT_SCHEDULES fs
+    JOIN FLIGHT_SEAT_TYPES fst ON fs.SCHEDULE_IDX = fst.SCHEDULE_IDX
+    LEFT JOIN FLIGHT_RESV_INFO fri ON fst.SEAT_TYPE_IDX = fri.SEAT_TYPE_IDX AND fs.SCHEDULE_IDX = fri.SCHEDULE_IDX
+    <where>
+        <if test="departureKeyword != null and departureKeyword != ''">
+            AND fs.DEPARTURE_NM LIKE CONCAT('%', #{departureKeyword}, '%')
+        </if>
+        <if test="configStatus != null and configStatus != ''">
+            <choose>
+                <when test="configStatus == 'unconfigured'">
+                    AND fri.PRICING_IDX IS NULL
+                </when>
+                <when test="configStatus == 'configured'">
+                    AND fri.PRICING_IDX IS NOT NULL
+                </when>
+            </choose>
+        </if>
+    </where>
+    ORDER BY fs.SCHEDULE_IDX DESC, fst.SEAT_TYPE_IDX ASC
+</select>
+
+<!-- 미설정 데이터 조회 -->
+<select id="countUnconfiguredFlights" resultType="long">
+    SELECT COUNT(*) FROM FLIGHT_SEAT_TYPES fst
+    WHERE NOT EXISTS (
+        SELECT 1 FROM FLIGHT_RESV_INFO fri
+        WHERE fri.SCHEDULE_IDX = fst.SCHEDULE_IDX AND fri.SEAT_TYPE_IDX = fst.SEAT_TYPE_IDX
+    )
+</select>
+
+<!-- 저장된 데이터 조회 -->
+<select id="countConfiguredFlights" resultType="long">
+    SELECT COUNT(DISTINCT SCHEDULE_IDX, SEAT_TYPE_IDX) FROM FLIGHT_RESV_INFO
+</select>
+
+<!-- UPSERT -->
+<insert id="upsertFlightResvInfo" parameterType="java.util.List">
+    INSERT INTO FLIGHT_RESV_INFO (SCHEDULE_IDX, SEAT_TYPE_IDX, BOOKING_START_DATE, BOOKING_END_DATE, PRICE_PER_PERSON)
+    VALUES
+    <foreach collection="list" item="item" separator=",">
+        (#{item.scheduleIdx}, #{item.seatTypeIdx}, #{item.bookingStartDate}, #{item.bookingEndDate}, #{item.pricePerPerson})
+    </foreach>
+    ON DUPLICATE KEY UPDATE
+        BOOKING_START_DATE = VALUES(BOOKING_START_DATE),
+        BOOKING_END_DATE = VALUES(BOOKING_END_DATE),
+        PRICE_PER_PERSON = VALUES(PRICE_PER_PERSON)
+</insert>
+
+</mapper>

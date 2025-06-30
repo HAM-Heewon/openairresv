@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>좌석 및 예약 설정</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" type="text/css" th:href="@{/css/head_menu.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/css/seat_list.css}">
+</head>
+<body>
+    <div class="container">
+        <div th:replace="~{admin_header :: header}"></div>
+        <div th:replace="~{admin_menu :: menu}"></div>
+        
+        <div class="content">
+            <h2 class="section-title">좌석 및 예약관리</h2>
+            
+            <div class="search-section">
+                <!-- [수정된 부분] form에 id를 부여하고 hidden input을 추가합니다. -->
+                <form id="searchForm" th:action="@{/resvinfo/settings}" method="get" class="search-form-container">
+                    <div class="search-info">
+                        <!-- 필터 링크 추가 및 건수 표시 -->
+                        <a href="#" class="filter-link" data-status="unconfigured" th:classappend="${configStatus == 'unconfigured' || configStatus == null} ? 'active' : ''">
+                            미설정 항공코드 <span th:text="${unconfiguredCount}">0</span>건
+                        </a> | 
+                        <a href="#" class="filter-link" data-status="configured" th:classappend="${configStatus == 'configured'} ? 'active' : ''">
+                            설정 완료 항공코드 <span th:text="${configuredCount}">0</span>건
+                        </a>
+                    </div>
+                    <div class="search-form">
+                        <!-- 필터 상태를 서버로 전송하기 위한 hidden input -->
+                        <input type="hidden" name="configStatus" id="configStatusInput" th:value="${configStatus}">
+                        
+                        <select class="search-select" name="searchType">
+                            <option value="departure">출발지</option>
+                        </select>
+                        <input type="text" class="search-input" name="Keyword" placeholder="출발지를 입력하세요" th:value="${Keyword}">
+                        <button type="submit" class="btn-search">검색</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 100px;">공항코드</th>
+                            <th style="width: 150px;">항공사명</th>
+                            <th style="width: 100px;">항공코드</th>
+                            <th style="width: 120px;">항공편명</th>
+                            <th style="width: 80px;">출발지</th>
+                            <th style="width: 80px;">도착지</th>
+                            <th style="width: 100px;">좌석형태</th>
+                            <th style="width: 80px;">좌석수</th>
+                            <th style="width: 120px;">예약 시작일</th>
+                            <th style="width: 120px;">예약 종료일</th>
+                            <th style="width: 80px;">1인 금액</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody">
+                        <tr th:if="${#lists.isEmpty(settings)}">
+                            <td colspan="11" class="no-data">검색된 항공편이 없습니다.</td>
+                        </tr>
+                        <th:block th:each="group : ${settings}">
+                            <tr th:each="seat, iterStat : ${group.seatSettings}" class="data-row">
+                                <td th:if="${iterStat.first}" th:rowspan="${#lists.size(group.seatSettings)}" th:text="${group.airportCd}"></td>
+                                <td th:if="${iterStat.first}" th:rowspan="${#lists.size(group.seatSettings)}" th:text="${group.airlineNm}"></td>
+                                <td th:if="${iterStat.first}" th:rowspan="${#lists.size(group.seatSettings)}" th:text="${group.flightCd}"></td>
+                                <td th:if="${iterStat.first}" th:rowspan="${#lists.size(group.seatSettings)}" th:text="${group.flightNm}"></td>
+                                <td th:if="${iterStat.first}" th:rowspan="${#lists.size(group.seatSettings)}" th:text="${group.departureNm}"></td>
+                                <td th:if="${iterStat.first}" th:rowspan="${#lists.size(group.seatSettings)}" th:text="${group.arrivalNm}"></td>
+                                
+                                <td th:text="${seat.seatTypeName}"></td>
+                                <td th:text="${seat.seatCount} + '석'"></td>
+                                <td>
+                                    <input type="hidden" class="schedule-idx" th:value="${group.scheduleIdx}" />
+                                    <input type="hidden" class="seat-type-idx" th:value="${seat.seatTypeIdx}" />
+                                    <input type="date" class="booking-start-date" th:value="${seat.bookingStartDate}">
+                                </td>
+                                <td><input type="date" class="booking-end-date" th:value="${seat.bookingEndDate}"></td>
+                                <td><input type="text" class="price-per-person" th:value="${seat.seatTypePrice != null ? #numbers.formatInteger(seat.seatTypePrice, 0, 'COMMA') : ''}" placeholder="금액 입력"></td>
+                            </tr>
+                        </th:block>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="bottom-actions">
+                <button type="button" class="btn-regi" onclick="regi_complete()">등록 완료</button>
+            </div>
+        </div>
+    </div>
+<div th:replace="~{admin_footer :: footer}"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentPath = window.location.pathname;
+        const menuItems = document.querySelectorAll('.menu-item');
+        menuItems.forEach(item => {
+            item.classList.remove('active');
+            const href = item.getAttribute('href');
+            if (href && href.includes('seat')) {
+                item.classList.add('active');
+            }
+        });
+
+        // [새로 추가된 부분] 필터 링크 클릭 이벤트 처리
+        document.querySelectorAll('.filter-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const status = this.dataset.status;
+                document.getElementById('configStatusInput').value = status;
+                document.querySelectorAll('.filter-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        document.querySelector('.search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                this.closest('form').submit();
+            }
+        });
+        
+        document.querySelectorAll('.price-per-person').forEach(input => {
+            input.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/[^0-9]/g, '');
+                if (value) {
+                    e.target.value = parseInt(value, 10).toLocaleString('ko-KR');
+                } else {
+                    e.target.value = '';
+                }
+            });
+        });
+        
+        function getTodayDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // 내일 날짜를 YYYY-MM-DD 형식으로 가져오는 함수
+        function getTomorrowDate() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1); // 현재 날짜에 1일 더하기
+            const year = tomorrow.getFullYear();
+            const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+            const day = String(tomorrow.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+
+        const today = getTodayDate();
+        const tomorrow = getTomorrowDate(); // 내일 날짜를 가져옵니다.
+
+        document.querySelectorAll('.data-row').forEach(row => {
+            const startDateInput = row.querySelector('.booking-start-date');
+            const endDateInput = row.querySelector('.booking-end-date');
+
+            // 예약 시작일: 값이 없으면 오늘 날짜로 디폴트 설정
+            if (!startDateInput.value) {
+                startDateInput.value = today;
+            }
+
+            // 예약 종료일: 최소 날짜를 내일 날짜로 설정
+            endDateInput.setAttribute('min', tomorrow);
+        });
+    });
+ 
+    function regi_complete() {
+        const rows = document.querySelectorAll('.data-row');
+        const dataToSave = [];
+        let validationFailed = false;
+
+        rows.forEach(row => {
+            const startDate = row.querySelector('.booking-start-date').value;
+            const endDate = row.querySelector('.booking-end-date').value;
+            const priceInput = row.querySelector('.price-per-person');
+            const price = priceInput ? priceInput.value.replace(/[^0-9]/g, '') : '';
+
+            if (startDate || endDate || price) {
+                if (!startDate || !endDate || !price) {
+                    alert('예약 시작일, 종료일, 금액은 모두 함께 입력해야 합니다.');
+                    validationFailed = true; return;
+                }
+                if (new Date(startDate) > new Date(endDate)) {
+                    alert('예약 종료일은 시작일보다 빠를 수 없습니다.');
+                    validationFailed = true; return;
+                }
+                dataToSave.push({
+                    scheduleIdx: row.querySelector('.schedule-idx').value,
+                    seatTypeIdx: row.querySelector('.seat-type-idx').value,
+                    bookingStartDate: startDate,
+                    bookingEndDate: endDate,
+                    seatTypePrice: price
+                });
+            }
+        });
+
+        if (validationFailed) return;
+
+        if (dataToSave.length === 0) {
+            alert('저장할 데이터를 최소 한 줄 이상 입력해주세요.');
+            return;
+        }
+
+        fetch('/resvinfo/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dataToSave)
+        })
+        .then(response => {
+            if (!response.ok) return response.text().then(text => { throw new Error(text) });
+            return response.text();
+        })
+        .then(message => {
+            alert(message);
+            location.reload();
+        })
+        .catch(error => {
+            alert('오류: ' + error.message);
+        });
+    }
+</script>
+</body>
+</html>

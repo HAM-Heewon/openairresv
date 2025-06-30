@@ -1,0 +1,189 @@
+@charset "UTF-8";
+ body {
+    font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #2c2c2c;
+    color: #e0e0e0;
+        display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+/* 메인 컨테이너 */
+.container {
+	width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #2c2c2c;
+    min-height: calc(100vh - 120px);
+        flex:1;
+}
+
+.content {
+    padding: 0;
+    background: #2c2c2c;
+}
+
+.section-title {
+    color: white;
+    padding: 8px 15px;
+    margin: 0;
+    margin-top: 1em;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 0;
+}
+
+.section-title::before {
+    content: "■ ";
+    margin-right: 5px;
+    color: #e74c3c;
+    font-size: 16px;
+    line-height: 1;
+    vertical-align: baseline;
+}
+
+/* 폼 섹션 */
+.form-section {
+    background: #3a3a3a;
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.form-label {
+    width: 120px;
+    padding-top: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #e0e0e0;
+    flex-shrink: 0;
+}
+
+.form-input {
+    flex: 1;
+}
+
+.form-input input[type="text"] {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background: #2c2c2c;
+    color: #e0e0e0;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.form-input input[type="text"]:focus {
+    outline: none;
+    border-color: #8b4444;
+    box-shadow: 0 0 5px rgba(139, 68, 68, 0.3);
+}
+
+.form-input textarea {
+    width: 100%;
+    min-height: 400px;
+    padding: 15px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background: #2c2c2c;
+    color: #e0e0e0;
+    font-size: 14px;
+    font-family: inherit;
+    resize: none;
+    box-sizing: border-box;
+}
+
+.form-input textarea:focus {
+    outline: none;
+    border-color: #8b4444;
+    box-shadow: 0 0 5px rgba(139, 68, 68, 0.3);
+}
+
+
+.bottom-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-register, .btn-update {
+    background: #8b4444;
+    color: white;
+}
+
+.btn-register:hover, .btn-update:hover {
+    background: #a04545;
+}
+
+.btn-cancel {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-cancel:hover {
+    background: #545b62;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .nav-content {
+        flex-wrap: wrap;
+        padding: 0;
+    }
+    
+    .nav-item {
+        flex: 1;
+        text-align: center;
+        padding: 12px 10px;
+    }
+    
+    .form-section {
+        margin: 10px;
+        padding: 20px;
+    }
+    
+    .form-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .form-label {
+        width: auto;
+        padding-top: 0;
+    }
+    
+
+    
+    .bottom-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn {
+        width: 200px;
+    }
+}

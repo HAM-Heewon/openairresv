@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<th:block th:fragment="header">
+
+<head>
+<meta charset="UTF-8">
+<title>헤더</title>
+<!-- <link rel="stylesheet" type="text/css" href="./css/admin_header.css"> -->
+ <link th:href="@{/css/admin_header.css}" rel="stylesheet">
+</head>
+<body>
+    <!-- 헤더 Fragment -->
+    <div class="header">
+        <div class="header-left">
+            <i class="fas fa-user-shield admin-icon"></i>
+            <span class="admin-text">ADMINISTRATOR</span>
+        </div>
+        <div class="header-right">
+            <span style="color: #4CAF50; font-weight: bold;" sec:authentication="principal.usersDto.adminNm"></span>
+            <span>님 환영합니다.</span> 
+            <a href="#">[개인정보 수정]</a> 
+		    <form th:action="@{/logout}" method="post">
+		        <button type="submit" class="logout-btn" >[로그아웃]</button>
+		        <!-- 
+		         style="display: inline; margin: 0; padding: 0;"
+		        style="background: none; color: #ccc; border: none; cursor: pointer;"
+		         -->
+		        
+		    </form>
+        </div>
+    </div>
+</body>
+</th:block>
+</html>

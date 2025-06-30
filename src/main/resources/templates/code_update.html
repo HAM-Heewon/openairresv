@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>항공 코드 수정</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<!-- CSS 경로가 다를 경우, 실제 프로젝트에 맞게 수정해주세요 -->
+<link rel="stylesheet" type="text/css" th:href="@{/css/head_menu.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/css/air_newcode.css}">
+</head>
+<body>
+<div class="container">
+    <div th:replace="~{admin_header :: header}"></div>
+    <div th:replace="~{admin_menu :: menu}"></div>
+    
+    <div class="content">
+        <h2 class="section-title">항공 코드 수정 페이지</h2>
+        
+        <div class="registration-form">
+            <!-- th:object를 사용하여 폼과 컨트롤러에서 받은 airCode 객체를 연결합니다. -->
+            <form id="airlineCodeForm" th:object="${airCode}" method="post">
+                
+                <!-- 수정 시 airIdx 값을 유지하기 위한 hidden input -->
+                <input type="hidden" th:field="*{airIdx}" />
+
+                <!-- [수정된 부분] 신규 등록 폼과 동일한 레이아웃으로 변경 -->
+                <div class="form-row">
+                    <div class="form-input">
+                        <label class="form-label">공항코드</label>
+                        <input type="text" class="form-text" th:field="*{airportCode}" id="airportCode" placeholder="공항코드를 입력하세요">
+                        <span class="input-note">※ 공항코드는 무조건 대문자로 입력 되도록 합니다.</span>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-input">
+                        <label class="form-label">항공사명</label>
+                        <input type="text" class="form-text" th:field="*{airlineName}" id="airlineName" placeholder="항공사명을 입력하세요">
+                        <span class="input-note">※ 항공사명은 특수문자는 입력 되지 않습니다.</span>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-input">
+                        <label class="form-label">항공편코드</label>
+                        <input type="text" class="form-text" th:field="*{flightCode}" id="flightCode" placeholder="항공편코드를 입력하세요" readonly>
+                        <span class="input-note">※ 항공편코드는 수정할 수 없습니다.</span>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-input">
+                        <label class="form-label">항공편명</label>
+                        <input type="text" class="form-text" th:field="*{flightName}" id="flightName" placeholder="항공편명을 입력하세요">
+                        <span class="example-text">※ 예시 Korean Air, Jeju Air, Air Busan</span>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-input">
+                        <label class="form-label">사용 유/무</label>
+                        <div class="radio-group">
+                            <label class="radio-item">
+                                <input type="radio" th:field="*{useStatus}" value="Y">
+                                <span>사용함</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" th:field="*{useStatus}" value="N">
+                                <span>사용안함</span>
+                            </label>
+                        </div>
+                        <span class="input-note">※ 사용안함으로 설정하게 되면 항공편 등록시 해당 항공코드가 출력 되지 않습니다.</span>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <div class="button-group">
+            <button type="button" class="btn btn-update" onclick="submitUpdateForm()">수정 완료</button>
+            <button type="button" class="btn btn-list" th:onclick="|location.href='@{/code_list}'|">항공 코드 리스트</button>
+        </div>
+    </div>
+</div>
+<div th:replace="~{admin_footer :: footer}"></div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. 메뉴 활성화 로직
+    const currentPath = window.location.pathname;
+    const menuItems = document.querySelectorAll('.menu-item');
+    menuItems.forEach(item => {
+        item.classList.remove('active');
+        const href = item.getAttribute('href');
+        if (href && href.includes('code')) {
+            item.classList.add('active');
+        }
+    });
+
+    // 2. 입력 필터링 로직
+    document.getElementById('airportCode').addEventListener('input', function() {
+        this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '');
+    });
+
+    document.getElementById('airlineName').addEventListener('input', function(e) {
+        if (e.isComposing) return;
+        this.value = this.value.replace(/[^a-zA-Z0-9가-힣\s]/g, '');
+    });
+    
+    document.getElementById('flightName').addEventListener('input', function() {
+        this.value = this.value.replace(/[가-힣]/g, '');
+    });
+});
+
+/**
+ * 폼 유효성 검사 및 AJAX 제출 함수
+ */
+function submitUpdateForm() {
+    const form = document.getElementById('airlineCodeForm');
+    
+    // 1. 유효성 검사
+    if (!form.airportCode.value.trim()) { alert('공항코드를 입력해주세요.'); form.airportCode.focus(); return; }
+    if (!form.airlineName.value.trim()) { alert('항공사명을 입력해주세요.'); form.airlineName.focus(); return; }
+    if (!form.flightName.value.trim()) { alert('항공편명을 입력해주세요.'); form.flightName.focus(); return; }
+
+    // 2. 폼 데이터를 JSON 객체로 생성
+    const formData = {
+        airIdx: form.airIdx.value,
+        airportCode: form.airportCode.value,
+        airlineName: form.airlineName.value,
+        flightCode: form.flightCode.value,
+        flightName: form.flightName.value,
+        useStatus: document.querySelector('input[name="useStatus"]:checked').value
+    };
+
+    if (confirm('항공 코드를 수정하시겠습니까?')) {
+        // 3. fetch API를 사용하여 서버에 데이터 전송
+        fetch('/code/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error(text || '서버 오류가 발생했습니다.') });
+            }
+            return response.text();
+        })
+        .then(successMessage => {
+            alert(successMessage);
+            location.href = '/code_list';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('오류: ' + error.message);
+        });
+    }
+}
+</script>
+</body>
+</html>

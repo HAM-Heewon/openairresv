@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<th:block  th:fragment="footer">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" type="text/css" th:href="@{/css/footer.css}">
+    <footer class="main_copyright">
+        <div>
+            Copyright ⓒ 2025 <span th:text="${globaldata?.cName} ?: ''"></span> All rights reserved.
+        </div>
+    </footer>
+</html>
+</th:block>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.air.mapper.NoticeMapper">
+<resultMap id="dataListMap" type="kr.co.air.dtos.DatalistDto">
+    <id property="eno" column="ENO"/>
+    <result property="empno" column="EMPNO"/>
+    <result property="eTitle" column="E_TITLE"/>
+    <result property="ename" column="ENAME"/>
+    <result property="esubject" column="ESUBJECT"/>
+    <result property="createDate" column="CREATE_DATE"/>
+    <result property="updateDate" column="UPDATE_DATE"/>
+    <result property="fileName" column="FILE_NAME"/>
+    <result property="fileSavename" column="FILE_SAVENAME"/>
+    <result property="filePath" column="FILE_PATH"/>
+    <result property="eView" column="E_VIEW"/>
+    <result property="fileSize" column="FILE_SIZE"/>
+</resultMap>
+<insert id="insertNotice" parameterType="kr.co.air.dtos.DatalistDto">
+INSERT INTO DATA_LIST (
+    E_TITLE,
+    ESUBJECT,
+    ENAME,
+    EMPNO,
+    FILE_NAME,
+    FILE_SAVENAME,
+    FILE_PATH,
+    FILE_SIZE
+) VALUES (
+    #{eTitle},
+    #{esubject},
+    #{ename},
+    #{empno},
+    #{fileName},
+    #{fileSavename},
+    #{filePath},
+    #{fileSize}
+)
+</insert>
+
+
+<!-- 공지사항 데이터 전체 조회 -->
+<select id="findAllNotice" resultMap="dataListMap">
+SELECT * FROM DATA_LIST ORDER BY ENO DESC
+</select>
+
+<!-- 공지사항 상세페이지 출력 -->
+<select id="findById" parameterType="int" resultMap="dataListMap">
+    SELECT * FROM DATA_LIST WHERE ENO = #{eno}
+</select>
+<!-- 공지사항 상세페이지 출력시 조회수 증가 -->
+<update id="incrementView" parameterType="int">
+    UPDATE DATA_LIST SET E_VIEW = E_VIEW + 1 WHERE ENO = #{eno}
+</update>
+
+<!-- 공지사항 수정 -->
+<update id="updateNotice" parameterType="kr.co.air.dtos.DatalistDto">
+    UPDATE DATA_LIST
+    SET
+        E_TITLE = #{eTitle},
+        ESUBJECT = #{esubject},
+        ENAME = #{ename}
+
+        <if test="fileName != null and fileName != ''">
+            , FILE_NAME = #{fileName}
+            , FILE_SAVENAME = #{fileSavename}
+            , FILE_PATH = #{filePath}
+            , FILE_SIZE = #{fileSize}
+        </if>
+    WHERE
+        ENO = #{eno}
+</update>
+<!--         TODO: 공지사항 여부(isNotice) 컬럼이 DB에 추가되면 SET절에 추가해야 합니다.
+         IS_NOTICE = #{isNotice},  -->
+         
+<select id="findByNos" parameterType="java.util.List" resultMap="dataListMap">
+    SELECT ENO, FILE_PATH FROM DATA_LIST
+    WHERE ENO IN
+    <foreach item="id" collection="enos" open="(" separator="," close=")">
+        #{id}
+    </foreach>
+</select>
+<!-- 공지사항 삭제 -->
+<delete id="deleteByIds">
+    DELETE FROM DATA_LIST
+    WHERE ENO IN
+    <foreach item="id" collection="list" open="(" separator="," close=")">
+        #{id}
+    </foreach>
+</delete>
+</mapper>

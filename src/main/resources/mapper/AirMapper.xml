@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.air.mapper.UserMapper">
+    <!-- UsersDto와 ADMIN_USERS 테이블 컬럼 매핑 -->
+    <resultMap id="adminUserResultMap" type="kr.co.air.dtos.UsersDto">
+        <id property="adIdx" column="AD_IDX"/>
+        <result property="adminId" column="ADMIN_ID"/>
+        <result property="adminPw" column="ADMIN_PW"/>
+        <result property="adminNm" column="ADMIN_NM"/>
+        <result property="adminTel" column="ADMIN_TEL"/>
+        <result property="adminEmail" column="ADMIN_EMAIL"/>
+        <result property="department" column="DEPARTMENT"/>
+        <result property="positionCode" column="POSITION_CODE"/>
+        <result property="positionName" column="POSITION_NAME"/>
+        <result property="adminAgree" column="ADMIN_AGREE"/>
+    </resultMap>
+    <!-- 로그인용 사용자 조회 (모든 컬럼 포함) -->
+    <select id="findByUsername" parameterType="String" resultMap="adminUserResultMap">
+        SELECT 
+            AD_IDX, ADMIN_ID, ADMIN_PW, ADMIN_NM, ADMIN_TEL,
+            ADMIN_EMAIL, DEPARTMENT, POSITION_CODE, POSITION_NAME, ADMIN_AGREE
+        FROM ADMIN_USERS 
+        WHERE ADMIN_ID = #{adminId}
+    </select>
+    
+<!-- admin_list 데이터 출력 -->
+<select id="findallusers" resultMap="adminUserResultMap">
+SELECT 
+    AD_IDX, ADMIN_ID, ADMIN_PW, ADMIN_NM, ADMIN_TEL, 
+    ADMIN_EMAIL, DEPARTMENT, POSITION_CODE, POSITION_NAME , ADMIN_AGREE
+FROM ADMIN_USERS
+ORDER BY AD_IDX DESC
+</select>
+
+<!-- 관리자 승인/미승인 -->
+<update id="updateAdminAgree">
+    UPDATE ADMIN_USERS
+    SET ADMIN_AGREE = #{adminAgree}
+    WHERE AD_IDX = #{adIdx}
+</update>
+
+<!-- 관리자 등록 요청(회원가입) -->
+<insert id="insertAdmin" parameterType="kr.co.air.dtos.UsersDto">
+    INSERT INTO ADMIN_USERS(ADMIN_ID, ADMIN_PW, ADMIN_NM, ADMIN_TEL, ADMIN_EMAIL, DEPARTMENT,POSITION_CODE,ADMIN_AGREE)
+    VALUES(
+        #{adminId},
+        #{adminPw},
+        #{adminNm},
+        #{adminTel},
+        #{adminEmail},
+        #{department},
+        #{positionCode},
+        #{adminAgree}
+    )
+</insert>
+<!-- 관리자 신규 등록 아이디 중복확인 -->
+<select id="checkid" parameterType="String" resultType="int">
+    SELECT COUNT(*) FROM ADMIN_USERS WHERE ADMIN_ID = #{adminId}
+</select>
+
+
+<!-- 공지사항 : 사용자 이름으로 AD_IDX 조회 -->
+<select id="findAdIdx" parameterType="String" resultType="long">
+    SELECT AD_IDX 
+    FROM ADMIN_USERS 
+    WHERE ADMIN_ID = #{adminId}
+    LIMIT 1
+</select>
+</mapper>

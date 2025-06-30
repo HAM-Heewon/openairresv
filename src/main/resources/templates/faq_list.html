@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>고객관리 FAQ</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" type="text/css" th:href="@{/css/head_menu.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/css/faq_list.css}">
+</head>
+<body>
+<div class="container">
+   <div th:replace="~{admin_header :: header}"></div>
+   <div th:replace="~{admin_menu :: menu}"></div>
+   
+<div class="content">
+    <h2 class="section-title">FAQ 관리페이지</h2>
+    
+    <div class="search-section">
+        <form th:action="@{/air-faq/list}" method="get" class="search-form">
+            <span style="color: #e0e0e0; margin-right: 10px;">FAQ 제목 검색</span>
+            <input type="text" class="search-input" name="searchKeyword" id="searchKeyword" placeholder="검색어를 입력하세요" th:value="${searchKeyword}">
+            <button type="submit" class="btn-search">검색</button>
+        </form>
+    </div>
+    
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width: 80px;">QA</th>
+                    <th style="width: 500px;">제목</th>
+                    <th style="width: 100px;">등록일</th>
+                    <th style="width: 80px;">관리</th>
+                </tr>
+            </thead>
+            <tbody id="dataTableBody">
+                <tr th:if="${#lists.isEmpty(alldata)}">
+                    <td colspan="4" class="no-data">등록된 FAQ가 없습니다.</td>
+                </tr>
+                <tr th:each="faq : ${alldata}">
+                    <td>Q</td>
+                    <td style="text-align: left;">
+                        <a th:href="@{/air-faq/edit/{fIdx}(fIdx=${faq.fIdx})}" th:text="${faq.fTitle}" class="faq-title-link"></a>
+                    </td>
+                    <td th:text="${#temporals.format(faq.fCreatedate, 'yyyy-MM-dd')}"></td>
+                    <td>
+                       <button type="button" class="btn-small btn-delete status-badge status-active" th:onclick="|deleteFaq(${faq.fIdx})|">삭제</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="pagination">
+        <!-- 페이지네이션 추후 구현 -->
+    </div>
+    
+    <div class="bottom-actions">
+        <!-- [수정된 부분] 선택 삭제 버튼 제거 -->
+        <button type="button" class="btn-register" th:onclick="|location.href='@{/air-faq/write}'|">FAQ 등록</button>
+    </div>
+</div>
+</div>
+<div th:replace="~{admin_footer :: footer}"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const currentPath = window.location.pathname;
+    const menuItems = document.querySelectorAll('.menu-item');
+    
+    menuItems.forEach(item => {
+        item.classList.remove('active');
+        const href = item.getAttribute('href');
+        if (href && href.includes('faq')) {
+            item.classList.add('active');
+        }
+    });
+});
+
+function deleteFaq(fIdx) {
+    if (confirm('이 FAQ를 삭제하시겠습니까?')) {
+        requestDelete([fIdx]);
+    }
+}
+
+function requestDelete(ids) {
+    fetch('/air-faq/delete', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(ids)
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => { throw new Error(text || '서버 오류') });
+        }
+        return response.text();
+    })
+    .then(message => {
+        alert(message);
+        location.reload();
+    })
+    .catch(error => {
+        alert('오류: ' + error.message);
+    });
+}
+</script>
+</body>
+</html>

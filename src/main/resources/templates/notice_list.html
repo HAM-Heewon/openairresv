@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>공지사항</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" type="text/css" th:href="@{/css/head_menu.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/css/notice_list.css}">
+</head>
+<body>
+<div class="container">
+    <div th:replace="admin_header :: header"></div>
+    
+    <div th:replace="admin_menu :: menu"></div>
+    
+    <!-- 메인 콘텐츠 -->
+    <div class="content">
+        <h2 class="section-title">공지사항 관리페이지</h2>
+        
+
+        
+        <!-- 공지사항 테이블 -->
+        <table class="notice-table">
+            <thead>
+                <tr>
+                    <th class="checkbox-col">
+                        <input type="checkbox" id="selectAll" onchange="toggleAll(this)">
+                    </th>
+                    <th class="no-col">NO</th>
+                    <th class="title-col">제목</th>
+                    <th class="author-col">글쓴이</th>
+                    <th class="date-col">날짜</th>
+                    <th class="views-col">조회</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 데이터가 없을 때 -->
+                <tr th:if="${#lists.isEmpty(noticeList)}">
+                    <td colspan="6" class="no-data">등록된 공지 내용이 없습니다.</td>
+                </tr>
+                
+                <tr th:each="notice : ${noticeList}">
+                    <td><input type="checkbox" name="noticeIds" class="notice-checkbox" th:value="${notice.eno}"></td>
+                    <td th:text="${notice.eno}">1</td>
+                    <td class="title-cell">
+                        <!-- 상세 보기 페이지로 링크 (나중에 구현) -->
+                        <a href="#" th:href="@{/notice/{eno}(eno=${notice.eno})}" th:text="${notice.eTitle}">
+                            테스트 제목
+                        </a>
+                        <!-- 첨부 파일이 있을 경우 파일 아이콘 표시 -->
+                        <i class="fas fa-paperclip file-icon" th:if="${notice.fileName != null}"></i>
+                    </td>
+                    <td th:text="${notice.ename}">관리자</td>
+                    <!-- 날짜 형식을 'yyyy-MM-dd'로 포맷팅 -->
+                    <td th:text="${#temporals.format(notice.createDate, 'yyyy-MM-dd')}">2022-08-17</td>
+                    <td th:text="${notice.eView ?: 0}">100</td>
+                </tr>
+            </tbody>
+        </table>
+                <!-- 버튼 그룹 -->
+        <div class="button-group">
+        <button type="button" class="btn btn-secondary" onclick="deleteSelected()">공지삭제</button>
+            <a href="/notice_write" class="btn btn-primary">공지등록</a>
+        </div>
+        
+        <!-- 페이지네이션 -->
+        <div class="pagination">
+            <a href="#">«</a>
+            <a href="#">‹</a>
+            <span class="current">1</span>
+            <a href="#">›</a>
+            <a href="#">»</a>
+        </div>
+    </div>
+</div>
+<div th:replace="admin_footer :: footer"></div>
+
+<script>
+//메뉴 활성화 스크립트
+document.addEventListener('DOMContentLoaded', function() {
+    const currentPath = window.location.pathname;
+    const menuItems = document.querySelectorAll('.menu-item');
+    
+    // 모든 메뉴에서 active 클래스 제거
+    menuItems.forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // 항공편 관리 메뉴 활성화
+    if (currentPath.includes('notice')) {
+    menuItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href.includes('notice')) {
+            item.classList.add('active');
+        }
+    });
+    }
+    
+    const noticeCheckboxes = document.querySelectorAll('.notice-checkbox');
+    noticeCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateSelectAllCheckbox);
+    });
+    updateSelectAllCheckbox();
+    
+});
+
+function toggleAll(selectAllCheckbox) {
+    const noticeCheckboxes = document.querySelectorAll('.notice-checkbox');
+    noticeCheckboxes.forEach(checkbox => {
+        checkbox.checked = selectAllCheckbox.checked;
+    });
+}
+
+function deleteSelected() {
+    const checkedBoxes = document.querySelectorAll('.notice-checkbox:checked');
+    
+    if (checkedBoxes.length === 0) {
+        alert('삭제할 공지사항을 먼저 선택해주세요.');
+        return;
+    }
+
+    // 선택된 모든 공지사항의 고유번호(eno)를 배열에 담습니다.
+    const idsToDelete = Array.from(checkedBoxes).map(checkbox => checkbox.value);
+
+    if (confirm(`선택된 ${idsToDelete.length}개의 공지사항을 정말로 삭제하시겠습니까?`)) {
+        
+        // fetch API를 사용하여 서버에 실제 삭제 요청을 보냅니다.
+        fetch('/notice/delete', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(idsToDelete) // ID 배열을 JSON 문자열로 변환하여 전송
+        })
+        .then(response => {
+            if (!response.ok) {
+                // 서버에서 에러 응답이 올 경우
+                return response.text().then(text => { throw new Error(text || '서버에서 오류가 발생했습니다.') });
+            }
+            // 성공 응답일 경우
+            return response.text();
+        })
+        .then(successMessage => {
+            alert(successMessage);
+            location.reload(); // 페이지를 새로고침하여 삭제된 결과를 반영
+        })
+        .catch(error => {
+            alert('삭제 처리 중 오류가 발생했습니다: ' + error.message);
+        });
+    }
+}
+function updateSelectAllCheckbox() {
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const noticeCheckboxes = document.querySelectorAll('input[name="noticeIds"]');
+    const checkedCount = document.querySelectorAll('input[name="noticeIds"]:checked').length;
+    
+    if (checkedCount === 0) {
+        selectAllCheckbox.checked = false;
+
+    } else if (checkedCount === noticeCheckboxes.length) {
+        selectAllCheckbox.checked = true;
+
+    } else {
+        selectAllCheckbox.checked = false;
+
+    }
+}
+</script>
+</body>
+</html>

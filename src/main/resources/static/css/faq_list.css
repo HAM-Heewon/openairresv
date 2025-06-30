@@ -1,0 +1,262 @@
+@charset "UTF-8";
+ body {
+    font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #2c2c2c;
+    color: #e0e0e0;
+        display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+/* 메인 컨테이너 */
+.container {
+	width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #2c2c2c;
+    min-height: calc(100vh - 120px);
+        flex:1;
+}
+
+.content {
+    padding: 0;
+    background: #2c2c2c;
+}
+
+.section-title {
+    color: white;
+    padding: 8px 15px;
+    margin: 0;
+    margin-top: 1em;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 0;
+}
+
+.section-title::before {
+    content: "■ ";
+    margin-right: 5px;
+    color: #e74c3c;
+    font-size: 16px;
+    line-height: 1;
+    vertical-align: baseline;
+}
+
+/* 검색 섹션 */
+.search-section {
+    background: #3a3a3a;
+    padding: 20px;
+    border-bottom: 1px solid #555;
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.search-input {
+    padding: 8px 12px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background: #2c2c2c;
+    color: #e0e0e0;
+    font-size: 14px;
+    width: 300px;
+    height: 40px;
+    box-sizing: border-box;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #8b4444;
+    box-shadow: 0 0 5px rgba(139, 68, 68, 0.3);
+}
+
+.btn-search {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background: #6c5ce7;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    height: 40px;
+    box-sizing: border-box;
+}
+
+.btn-search:hover {
+    background: #5b4ec7;
+}
+
+/* 데이터 테이블 */
+.table-container {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #3a3a3a;
+}
+
+.data-table th {
+    background: #8b6f6f;
+    color: #e0e0e0;
+    padding: 12px 15px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    border-right: 1px solid #555;
+    white-space: nowrap;
+}
+
+.data-table th:last-child {
+    border-right: none;
+}
+
+.data-table td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px solid #555;
+    border-right: 1px solid #555;
+    color: #e0e0e0;
+    font-size: 14px;
+}
+.faq-title-link{
+	text-decoration: none;
+	    color: #e0e0e0;
+    font-size: 14px;
+}
+
+.data-table td:last-child {
+    border-right: none;
+}
+
+.data-table tr:hover {
+    background: #444;
+}
+
+.checkbox {
+    accent-color: #8b4444;
+}
+
+.no-data {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+    font-size: 14px;
+}
+
+/* FAQ 상태 표시 */
+.status-badge {
+    padding: 4px 8px;
+    border: none;
+    border-radius: 3px;
+    cursor:pointer;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.btn-delete {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #c82333;
+}
+
+/* 페이징 */
+.pagination {
+    text-align: center;
+    padding: 20px;
+    background: #3a3a3a;
+}
+
+.pagination a,
+.pagination span {
+    display: inline-block;
+    padding: 8px 12px;
+    margin: 0 2px;
+    text-decoration: none;
+    color: #e0e0e0;
+    border: 1px solid #555;
+    border-radius: 4px;
+}
+
+.pagination a:hover {
+    background: #555;
+}
+
+.pagination .current {
+    background: #8b4444;
+    color: white;
+    border-color: #8b4444;
+}
+
+/* 하단 버튼 */
+.bottom-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 20px;
+    background: #3a3a3a;
+    border-top: 1px solid #555;
+}
+
+.btn-register {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background: #8b4444;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.btn-register:hover {
+    background: #a04545;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .nav-content {
+        flex-wrap: wrap;
+        padding: 0;
+    }
+    
+    .nav-item {
+        flex: 1;
+        text-align: center;
+        padding: 12px 10px;
+    }
+    
+    .search-form {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    
+    .search-input {
+        width: 100%;
+    }
+    
+    .data-table {
+        font-size: 12px;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 8px;
+    }
+}

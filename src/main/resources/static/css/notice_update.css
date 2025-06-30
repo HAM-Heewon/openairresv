@@ -1,0 +1,204 @@
+@charset "UTF-8";
+
+/* 공지사항 등록 페이지 스타일 */
+body {
+    font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #2c2c2c;
+    color: #e0e0e0;
+        display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+	width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #2c2c2c;
+        flex:1;
+}
+
+.content {
+    padding: 0;
+    background: #2c2c2c;
+}
+
+.section-title {
+    color: white;
+    padding: 8px 15px;
+    margin: 0;
+    margin-top: 1em;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 0;
+    
+}
+
+.section-title::before {
+    content: "■ ";
+    margin-right: 5px;
+    color: #e74c3c;
+    font-size: 16px;
+    line-height: 1;
+    vertical-align: baseline;
+}
+.form-container {
+    background: #3a3a3a;
+    margin: 0;
+}
+
+.form-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #3a3a3a;
+}
+
+.form-table th {
+    background: #4a4a4a;
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: bold;
+    font-size: 14px;
+    color: #e0e0e0;
+    border-bottom: 1px solid #555;
+    width: 120px;
+    vertical-align: top;
+}
+
+.form-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #555;
+    background: #3a3a3a;
+    color: #e0e0e0;
+}
+
+.form-input {
+    padding: 8px 12px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background: #2c2c2c;
+    color: #e0e0e0;
+    font-size: 14px;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #8b4444;
+    box-shadow: 0 0 5px rgba(139, 68, 68, 0.3);
+}
+
+.form-input.title-input {
+    width: calc(100% - 300px);
+}
+
+.form-textarea {
+    width: 80%;
+    min-height: 300px;
+    padding: 12px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background: #2c2c2c;
+    color: #e0e0e0;
+    font-size: 14px;
+    resize: none;
+    font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    line-height: 1.6;
+}
+
+.form-textarea:focus {
+    outline: none;
+    border-color: #8b4444;
+    box-shadow: 0 0 5px rgba(139, 68, 68, 0.3);
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.checkbox-container input[type="checkbox"] {
+    margin-right: 8px;
+    accent-color: #8b4444;
+}
+
+.checkbox-container label {
+    font-size: 14px;
+    color: #e0e0e0;
+}
+
+.file-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.file-input {
+    width: 13.7em;
+    padding: 6px 12px;
+    border-radius: 4px;
+    color: #e0e0e0;
+    font-size: 13px;
+}
+
+.file-info {
+    font-size: 12px;
+    color: #999;
+}
+
+.char-count {
+    text-align: right;
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.notice-number {
+    background: #dc3545;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 50%;
+    font-size: 12px;
+    margin-left: 10px;
+    display: inline-block;
+    min-width: 20px;
+    text-align: center;
+}
+
+.button-group {
+    text-align: right;
+    padding: 15px;
+    background: #3a3a3a;
+    border-top: 1px solid #555;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 5px;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background: #8b4444;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #a04545;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}

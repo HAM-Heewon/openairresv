@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>관리자 메인</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" type="text/css" href="./css/head_menu.css">
+<link rel="stylesheet" type="text/css" href="./css/admin_list.css">
+</head>
+<body>
+<div class="container">
+    <div th:replace="admin_header :: header"></div>
+    
+    <div th:replace="admin_menu :: menu"></div>
+    
+    <!-- 메인 콘텐츠 -->
+    <div class="content">
+        <h2 class="section-title">신규등록 관리자</h2>
+
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>NO</th>
+                    <th>관리자명</th>
+                    <th>아이디</th>
+                    <th>전화번호</th>
+                    <th>이메일</th>
+                    <th>담당부서</th>
+                    <th>담당직책</th>
+                    <th>승인여부</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 데이터가 없을 때 -->
+                <tr th:if="${#lists.isEmpty(adminList)}">
+                    <td colspan="9" class="no-data">신규 등록된 관리자가 없습니다.</td>
+                </tr>
+                
+                <!-- 관리자 목록 -->
+                <tr th:each="admin, iterStat : ${adminList}">
+                    <td th:text="${iterStat.count}">1</td>
+                    <td th:text="${admin.adminNm}">관리자 이름</td>
+                    <td th:text="${admin.adminId}">관리자 아이디</td>
+                    <td th:text="${admin.adminTel}">전화번호</td>
+                    <td th:text="${admin.adminEmail}">이메일</td>  
+                    <td th:text="${admin.department}">담당부서</td>
+                    <td th:text="${admin.positionName}">담당직책</td>
+                    
+                    <td>
+                        <th:block th:if="${isTopLevelAdmin and admin.adminAgree == 'P'}">
+                            <button th:if="${admin.adminAgree == 'P'}" class="btn-real btn-small btn-approve" th:onclick="'approveAdmin(' + ${admin.adIdx} + ')'">승인</button>
+                            <button th:if="${admin.adminAgree == 'P'}" class="btn-real btn-small btn-reject" th:onclick="'rejectAdmin(' + ${admin.adIdx} + ')'">미승인</button>
+                        </th:block>
+                        <th:block th:if="${isTopLevelAdmin and admin.adminAgree != 'P'}">
+                            <span th:if="${admin.adminAgree == 'Y'}" class="btn-small btn-approve">승인</span>
+                            <span th:if="${admin.adminAgree == 'N'}" class="btn-small btn-reject">미승인</span>
+                        </th:block>
+                        <th:block th:unless="${isTopLevelAdmin}">
+                            <span th:if="${admin.adminAgree == 'Y'}" class="btn-small btn-approve">승인</span>
+                            <span th:if="${admin.adminAgree == 'N'}" class="btn-small btn-reject">미승인</span>
+                            <span th:if="${admin.adminAgree == 'P'}" class="btn-small btn-p">대기</span>
+                        </th:block>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+    
+
+</div>
+<div th:replace="admin_footer :: footer"></div>
+<script>
+function approveAdmin(adminId) {
+    if(confirm('관리자를 승인하시겠습니까?')) {
+        location.href = '/admin/Yadmin/' + adminId;
+    }
+}
+
+function rejectAdmin(adminId) {
+    if(confirm('관리자 승인을 거부하시겠습니까?')) {
+        location.href = '/admin/Nadmin/' + adminId;
+    }
+}
+
+//메뉴 활성화 스크립트
+document.addEventListener('DOMContentLoaded', function() {
+    const currentPath = window.location.pathname;
+    const menuItems = document.querySelectorAll('.menu-item');
+    
+    // 모든 메뉴에서 active 클래스 제거
+    menuItems.forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // 현재 경로에 맞는 메뉴 활성화
+    menuItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href === currentPath || href === '/admin_list') {
+            item.classList.add('active');
+        }
+    });
+});
+</script>
+</body>
+</html>

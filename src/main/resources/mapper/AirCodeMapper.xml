@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.air.mapper.AirCodeMapper">
+<resultMap id="airCodeResultMap" type="kr.co.air.dtos.AirCodeDto">
+    <id property="airIdx" column="AIR_IDX"/>
+    <result property="airportCode" column="AIRPORT_CD"/>
+    <result property="airlineName" column="AIRLINE_NM"/>
+    <result property="flightCode" column="FLIGHT_CD"/>
+    <result property="flightName" column="FLIGHT_NM"/>
+    <result property="useStatus" column="USE_STATUS"/>
+    <result property="createDate" column="CREATE_DATE"/>
+</resultMap>
+
+<!-- 항공편코드 중복검사용 -->
+<select id="countByFlightCode" parameterType="String" resultType="int">
+    SELECT COUNT(*)
+    FROM AIR_CODES
+    WHERE FLIGHT_CD = #{flightCode}
+</select>
+
+<!-- 항공코드 신규 입력 -->
+<insert id="insertAirCode" parameterType="kr.co.air.dtos.AirCodeDto">
+    INSERT INTO AIR_CODES (
+        AIRPORT_CD,
+        AIRLINE_NM,
+        FLIGHT_CD,
+        FLIGHT_NM,
+        USE_STATUS
+    ) VALUES (
+        #{airportCode},
+        #{airlineName},
+        #{flightCode},
+        #{flightName},
+        #{useStatus}
+    )
+</insert>
+
+<!-- 항공 코드 리스트 출력 -->
+<select id="findAllCodes" parameterType="map" resultMap="airCodeResultMap">
+    SELECT * FROM AIR_CODES
+    <where>
+        <if test="searchKeyword != null and searchKeyword != ''">
+            <choose>
+                <when test="searchType == 'flight_code'">
+                    AND FLIGHT_CD LIKE CONCAT('%', #{searchKeyword}, '%')
+                </when>
+                </choose>
+        </if>
+    </where>
+    ORDER BY AIR_IDX DESC
+</select>
+
+<!-- id로 조회 -->
+<select id="findAirCodeById" parameterType="int" resultMap="airCodeResultMap">
+    SELECT * FROM AIR_CODES WHERE AIR_IDX = #{airIdx}
+</select>
+
+<!-- 항공코드 업데이트 -->
+<update id="updateAirCode" parameterType="kr.co.air.dtos.AirCodeDto">
+    UPDATE AIR_CODES
+    SET
+        AIRPORT_CD = #{airportCode},
+        AIRLINE_NM = #{airlineName},
+        FLIGHT_CD = #{flightCode},
+        FLIGHT_NM = #{flightName},
+        USE_STATUS = #{useStatus}
+    WHERE AIR_IDX = #{airIdx}
+</update>
+
+<!-- 항공 코드 삭제 -->
+<delete id="deleteAirCodesByIds">
+        DELETE FROM AIR_CODES
+        WHERE AIR_IDX IN
+        <foreach item="id" collection="list" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.air.mapper.CompanyMapper">
+ <resultMap id="companyInfoResultMap" type="kr.co.air.dtos.CompanyInfoDto">
+    <id property="cId" column="C_ID"/>
+    <result property="cSitename" column="C_SITENAME"/>
+    <result property="cAdminmail" column="C_ADMINMAIL"/>
+    <result property="cPointuse" column="C_POINTUSE"/>
+    <result property="cNewmoney" column="C_NEWMONEY"/>
+    <result property="cNewlevel" column="C_NEWLEVEL"/>
+    <result property="cName" column="C_NAME"/>
+    <result property="cBusnum" column="C_BUSNUM"/>
+    <result property="cMaster" column="C_MASTER"/>
+    <result property="cMastertel" column="C_MASTERTEL"/>
+    <result property="cMailordernum" column="C_MAILORDERNUM"/>
+    <result property="cTelconum" column="C_TELCONUM"/>
+    <result property="cZipcode" column="C_ZIPCODE"/>
+    <result property="cAddr" column="C_ADDR"/>
+    <result property="cInfomaster" column="C_INFOMASTER"/>
+    <result property="cInfomastermail" column="C_INFOMASTERMAIL"/>
+    <result property="cBank" column="C_BANK"/>
+    <result property="cAccount" column="C_ACCOUNT"/>
+    <result property="cCarduse" column="C_CARDUSE"/>
+    <result property="cTelcredituse" column="C_TELCREDITUSE"/>
+    <result property="cGiftuse" column="C_GIFTUSE"/>
+    <result property="cPointpaymin" column="C_POINTPAYMIN"/>
+    <result property="cPointpaymax" column="C_POINTPAYMAX"/>
+    <result property="cCashreceiptuse" column="C_CASHRECEIPTUSE"/>
+    <result property="cUpdatedAt" column="C_UPDATED_AT"/>
+</resultMap>
+
+<!-- 회사정보 테이블 데이터 불러오기 -->
+<select id="getCompanyInfo" resultMap="companyInfoResultMap">
+SELECT * FROM COMPANYINFO WHERE C_ID = 1
+</select>
+
+<!-- 회사정보 테이블 수정 -->
+<update id="updateInfo" parameterType="kr.co.air.dtos.CompanyInfoDto">
+    UPDATE COMPANYINFO
+    SET
+        C_SITENAME = #{cSitename},
+        C_ADMINMAIL = #{cAdminmail},
+        C_POINTUSE = #{cPointuse},
+        C_NEWMONEY = #{cNewmoney},
+        C_NEWLEVEL = #{cNewlevel},
+        C_NAME = #{cName},
+        C_BUSNUM = #{cBusnum},
+        C_MASTER = #{cMaster},
+        C_MASTERTEL = #{cMastertel},
+        C_MAILORDERNUM = #{cMailordernum},
+        C_TELCONUM = #{cTelconum},
+        C_ZIPCODE = #{cZipcode},
+        C_ADDR = #{cAddr},
+        C_INFOMASTER = #{cInfomaster},
+        C_INFOMASTERMAIL = #{cInfomastermail},
+        C_BANK = #{cBank},
+        C_ACCOUNT = #{cAccount},
+        C_CARDUSE = #{cCarduse},
+        C_TELCREDITUSE = #{cTelcredituse},
+        C_GIFTUSE = #{cGiftuse},
+        C_POINTPAYMIN = #{cPointpaymin},
+        C_POINTPAYMAX = #{cPointpaymax},
+        C_CASHRECEIPTUSE = #{cCashreceiptuse}
+    WHERE C_ID = 1
+</update>
+    
+</mapper>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>FAQ 확인 및 수정</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" type="text/css" th:href="@{/css/head_menu.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/css/faq_write.css}">
+</head>
+<body>
+<div class="container">
+   <div th:replace="~{admin_header :: header}"></div>
+   <div th:replace="~{admin_menu :: menu}"></div>
+    <div class="content">
+        <h2 class="section-title">FAQ 확인 및 수정</h2>
+        
+        <div class="form-section">
+            <!-- [수정] th:object를 사용하여 컨트롤러에서 받은 faqdata 객체를 폼에 연결합니다. -->
+            <form id="faqUpdateForm" th:object="${faqDto}" method="post">
+                <!-- 수정을 위해 fIdx 값을 숨겨서 보관합니다. -->
+                <input type="hidden" th:field="*{fIdx}" />
+
+                <div class="form-group">
+                    <label class="form-label">질문 제목</label>
+                    <div class="form-input">
+                        <!-- [수정] th:field를 사용하여 DTO의 필드와 input을 연결합니다. -->
+                        <input type="text" th:field="*{fTitle}" placeholder="FAQ 제목을 입력하세요">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">글쓴이</label>
+                    <div class="form-input">
+                        <input type="text" value="관리자" readonly style="background: #444; color: #ccc;">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">질문 내용</label>
+                    <div class="form-input">
+                        <textarea th:field="*{fText}" placeholder="FAQ 내용을 입력하세요"></textarea>
+                    </div>
+                </div>
+                
+               <div class="bottom-actions">
+                <button type="button" class="btn btn-list" th:onclick="|location.href='@{/air-faq/list}'|">FAQ 리스트</button>
+                <button type="button" class="btn btn-update" onclick="submitUpdate()">FAQ 수정</button>
+                </div>
+             </form>
+        </div>
+    </div>
+</div>
+<div th:replace="~{admin_footer :: footer}"></div>
+
+<script th:inline="javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    const currentPath = window.location.pathname;
+    const menuItems = document.querySelectorAll('.menu-item');
+    
+    menuItems.forEach(item => {
+        item.classList.remove('active');
+        const href = item.getAttribute('href');
+        if (href && href.includes('faq')) {
+            item.classList.add('active');
+        }
+    });
+});
+
+/**
+ * [수정] 유효성 검사 후, AJAX로 데이터를 전송하는 함수
+ */
+ function submitUpdate() {
+	    const form = document.getElementById('faqUpdateForm');
+
+	    if (!form.fTitle.value.trim()) {
+	        alert('FAQ 제목을 입력해주세요.');
+	        form.fTitle.focus();
+	        return;
+	    }
+	    if (!form.fText.value.trim()) {
+	        alert('FAQ 내용을 입력해주세요.');
+	        form.fText.focus();
+	        return;
+	    }
+
+	    // 2. 전송할 데이터를 JSON 객체로 만듭니다.
+	    const formData = {
+	        fidx: form.fIdx.value,
+	        ftitle: form.fTitle.value,
+	        ftext: form.fText.value
+	    };
+	    
+	    console.log("데이터: ", formData);
+
+	    if (confirm('FAQ를 수정하시겠습니까?')) {
+	    	
+            fetch('/air-faq/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+            	if (!response.ok){
+            		return response.text().then(text => { throw new Error(text || '서버 오류 발생.') });
+            	}
+            	return response.text();
+            })
+            .then(successMessage => {
+            	alert(successMessage);
+            	location.href = '/air-faq/list';
+            }) 
+            .catch(error => {
+            	console.error('Error:', error);
+            	alert('오류: ' + error.message);
+            });
+	    }
+}
+
+</script>
+</body>
+</html>

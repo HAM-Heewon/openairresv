@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>항공편 정보 수정</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" type="text/css" th:href="@{/css/head_menu.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/css/product_new.css}">
+</head>
+<body>
+<div class="container">
+    <div th:replace="~{admin_header :: header}"></div>
+    <div th:replace="~{admin_menu :: menu}"></div>
+    
+    <div class="content">
+        <h2 class="section-title">항공편 정보 수정 페이지</h2>
+        
+        <div class="registration-form">
+            <form id="frm" th:action="@{/product/update}" th:object="${frm}" method="post">
+                
+                <input type="hidden" th:field="*{scheduleIdx}" />
+                
+                <div class="form-row">
+                    <label class="form-label">공항코드</label>
+                    <div class="form-input">
+                        <select class="form-select" th:field="*{airportCd}" id="airportCodeSelect">
+                            <option value="">공항코드를 선택하세요</option>
+                            <option th:each="code : ${portCode}" th:value="${code}" th:text="${code}"></option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <label class="form-label">항공사명</label>
+                    <div class="form-input">
+                        <select class="form-select" th:field="*{airlineNm}" id="airlineNameSelect"></select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <label class="form-label">항공코드</label>
+                    <div class="form-input">
+                        <select class="form-select" th:field="*{flightCd}" id="flightCodeSelect">
+                             <option th:value="${frm.flightCd}" th:text="${frm.flightCd}"></option>
+                        </select>
+                         <button type="button" class="btn-code" onclick="location.href='/air-codes/new'">항공 코드 관리</button>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <label class="form-label">항공편명</label>
+                    <div class="form-input">
+                        <input type="text" class="form-text" th:field="*{flightNm}" id="flightNameInput" readonly>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <label class="form-label">출발지</label>
+                    <div class="form-input">
+                        <input type="text" class="form-text-small" th:field="*{departureNm}" placeholder="출발지 입력">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <label class="form-label">도착지</label>
+                    <div class="form-input">
+                        <input type="text" class="form-text-small" th:field="*{arrivalNm}" placeholder="도착지 입력">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <label class="form-label">좌석 형태, 가격, 수량</label>
+                    <div class="form-input" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+                        <div id="seatTypeContainer" style="width: 100%;">
+                            <div th:each="seat, iterStat : *{seatTypes}" class="seat-type-item">
+                                <input type="text" class="form-text-small seat-type-name" th:name="|seatTypes[${iterStat.index}].seatTypeName|" placeholder="좌석 형태명" th:value="${seat.seatTypeName}">
+                                <input type="number" class="form-text-number seat-type-price" th:name="|seatTypes[${iterStat.index}].seatTypePrice|" placeholder="가격" min="0" th:value="${seat.seatTypePrice}">
+                                <span class="unit">원</span>
+                                <input type="number" class="form-text-number seat-count-item" th:name="|seatTypes[${iterStat.index}].seatCount|" placeholder="좌석 수" min="0" th:value="${seat.seatCount}" oninput="updateTotalSeats()">
+                                <span class="unit">석</span>
+                                <button type="button" class="btn-remove-seat" onclick="removeSeatTypeField(this)">삭제</button>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-add-seat-type" onclick="addSeatTypeField()">+ 좌석 형태 추가</button>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <label class="form-label">총좌석수</label>
+                    <div class="form-input">
+                        <input type="number" class="form-text-number" th:field="*{totalSeats}" id="totalSeatsInput" min="0" readonly>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <label class="form-label">운행 상태</label>
+                    <div class="form-input">
+                       <div class="radio-group">
+                            <label class="radio-item">
+                                <input type="radio" th:field="*{flightStatus}" value="운행가능">
+                                <span>운행가능</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" th:field="*{flightStatus}" value="운행종료">
+                                <span>운행종료</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <div class="button-group">
+            <button type="button" class="btn btn-list" onclick="location.href='/product_list'">항공편 리스트</button>
+            <button type="button" class="btn btn-register" onclick="validateAndSubmitForm()">정보 수정 완료</button>
+        </div>
+    </div>
+</div>
+<div th:replace="~{admin_footer :: footer}"></div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    
+    const initialAirlineNm = /*[[${frm.airlineNm}]]*/ null;
+    const initialFlightCd = /*[[${frm.flightCd}]]*/ null;
+    let seatTypeIndex = /*[[${#lists.size(frm.seatTypes)}]]*/ 0;
+    
+    function addSeatTypeField() {
+        const container = document.getElementById('seatTypeContainer');
+        const newRow = document.createElement('div');
+        newRow.className = 'seat-type-item';
+        
+        newRow.innerHTML = `
+            <input type="text" class="form-text-small seat-type-name" name=|"seatTypes[${seatTypeIndex}].seatTypeName|" placeholder="좌석 형태명">
+            <input type="number" class="form-text-number seat-type-price" name="|seatTypes[${seatTypeIndex}].seatTypePrice|" placeholder="가격" min="0">
+            <span class="unit">원</span>
+            <input type="number" class="form-text-number seat-count-item" name="|seatTypes[${seatTypeIndex}].seatCount|" placeholder="좌석 수" min="0" value="0" oninput="updateTotalSeats()">
+            <span class="unit">석</span>
+            <button type="button" class="btn-remove-seat" onclick="removeSeatTypeField(this)">삭제</button>
+        `;
+        container.appendChild(newRow);
+        seatTypeIndex++;
+        updateTotalSeats();
+    }
+
+    function removeSeatTypeField(button) {
+        const container = document.getElementById('seatTypeContainer');
+        if (container.children.length > 1) {
+            button.closest('.seat-type-item').remove();
+            updateTotalSeats();
+        } else {
+            alert('최소 하나의 좌석 형태는 등록해야 합니다.');
+        }
+    }
+
+    function updateTotalSeats() {
+        let total = 0;
+        document.querySelectorAll('.seat-count-item').forEach(input => {
+            total += parseInt(input.value) || 0;
+        });
+        document.getElementById('totalSeatsInput').value = total;
+    }
+
+    /**
+     * [수정된 부분] 폼 제출 방식을 AJAX로 변경하여 415 오류를 해결합니다.
+     */
+    function validateAndSubmitForm() {
+        const form = document.getElementById('frm');
+
+        // 1. 유효성 검사
+        if (!form.airportCd.value) { alert("공항코드를 선택해주세요."); return; }
+        if (!form.airlineNm.value) { alert("항공사명을 선택해주세요."); return; }
+        if (!form.flightCd.value) { alert("항공코드를 선택해주세요."); return; }
+        if (!form.departureNm.value.trim()) { alert("출발지를 입력해주세요."); return; }
+        if (!form.arrivalNm.value.trim()) { alert("도착지를 입력해주세요."); return; }
+        if (form.departureNm.value.trim() === form.arrivalNm.value.trim()) { alert('출발지와 도착지는 같을 수 없습니다.'); return; }
+        
+        const seatItems = document.querySelectorAll('.seat-type-item');
+        if (seatItems.length === 0) {
+            alert('최소 하나의 좌석 형태는 추가해야 합니다.');
+            return;
+        }
+
+        for (let i = 0; i < seatItems.length; i++) {
+            const item = seatItems[i];
+            const typeNameInput = item.querySelector('.seat-type-name');
+            const priceInput = item.querySelector('.seat-type-price');
+            const countInput = item.querySelector('.seat-count-item');
+            if (!typeNameInput.value.trim()) { alert((i + 1) + "번째 좌석 형태명을 입력해주세요."); typeNameInput.focus(); return; }
+            if (!priceInput.value.trim() || parseInt(priceInput.value) < 0) { alert((i + 1) + "번째 좌석 가격을 올바르게 입력해주세요."); priceInput.focus(); return; }
+            if (!countInput.value.trim() || parseInt(countInput.value) < 1) {
+                alert((i + 1) + "번째 좌석 수를 1 이상 입력해주세요.");
+                countInput.focus();
+                return;
+            }
+        }
+        
+        if (parseInt(document.getElementById('totalSeatsInput').value) < 1) {
+            alert("총좌석수는 1 이상이어야 합니다.");
+            return;
+        }
+
+        // 2. 폼 데이터를 JSON 객체로 생성
+        const schedData = {
+            scheduleIdx: form.scheduleIdx.value,
+            airportCd: form.airportCd.value,
+            airlineNm: form.airlineNm.value,
+            flightCd: form.flightCd.value,
+            flightNm: form.flightNm.value,
+            departureNm: form.departureNm.value,
+            arrivalNm: form.arrivalNm.value,
+            totalSeats: form.totalSeats.value,
+            flightStatus: document.querySelector('input[name="flightStatus"]:checked').value,
+            seatTypes: []
+        };
+        seatItems.forEach(item => {
+            schedData.seatTypes.push({
+                seatTypeName: item.querySelector('.seat-type-name').value,
+                seatTypePrice: item.querySelector('.seat-type-price').value,
+                seatCount: item.querySelector('.seat-count-item').value
+            });
+        });
+
+        // 3. fetch API를 사용하여 서버에 JSON 데이터 전송
+        fetch('/product/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(schedData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error(text || '서버 오류') });
+            }
+            return response.text();
+        })
+        .then(successMessage => {
+            alert(successMessage);
+            location.href = '/product_list';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('오류: ' + error.message);
+        });
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // 메뉴 활성화 로직
+        const currentPath = window.location.pathname;
+        const menuItems = document.querySelectorAll('.menu-item');
+        
+        menuItems.forEach(item => {
+            item.classList.remove('active');
+            const href = item.getAttribute('href');
+            if (href === '/product/edit' || (href.includes('product'))) {
+                item.classList.add('active');
+            }
+        });
+
+        updateTotalSeats();
+        
+        const airportSelect = document.getElementById('airportCodeSelect');
+        const airlineSelect = document.getElementById('airlineNameSelect');
+        const flightSelect = document.getElementById('flightCodeSelect');
+        const flightNameInput = document.getElementById('flightNameInput');
+        
+        if (airportSelect.value) {
+            loadAirlines(airportSelect.value, () => {
+                if(airlineSelect.value) {
+                    loadFlightCodes(airportSelect.value, airlineSelect.value);
+                }
+            });
+        }
+        
+        airportSelect.addEventListener('change', function() {
+            loadAirlines(this.value);
+            resetSelect(flightSelect, '항공사명을 먼저 선택하세요');
+            flightNameInput.value = '';
+        });
+
+        airlineSelect.addEventListener('change', function() {
+            loadFlightCodes(airportSelect.value, this.value);
+        });
+
+        flightSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            flightNameInput.value = selectedOption.dataset.flightName || '';
+        });
+    });
+
+    function loadAirlines(airportCode, callback) {
+        const airlineSelect = document.getElementById('airlineNameSelect');
+        fetch(`/product/airline?airportCode=${airportCode}`)
+            .then(response => response.json())
+            .then(data => {
+                airlineSelect.innerHTML = '<option value="">항공사명을 선택하세요</option>';
+                data.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item;
+                    option.textContent = item;
+                    if(item === initialAirlineNm) {
+                        option.selected = true;
+                    }
+                    airlineSelect.appendChild(option);
+                });
+                airlineSelect.disabled = false;
+                if(callback) callback();
+            })
+            .catch(error => console.error('Error loading airlines:', error));
+    }
+
+    function loadFlightCodes(airportCode, airlineName) {
+        const flightSelect = document.getElementById('flightCodeSelect');
+        const flightNameInput = document.getElementById('flightNameInput');
+        
+        fetch(`/product/flightname?airportCode=${airportCode}&airlineName=${airlineName}`)
+            .then(response => response.json())
+            .then(data => {
+                flightSelect.innerHTML = '';
+                
+                const currentOption = document.createElement('option');
+                currentOption.value = initialFlightCd;
+                currentOption.textContent = initialFlightCd;
+                currentOption.selected = true;
+                const currentFlight = /*[[${frm}]]*/ {};
+                currentOption.dataset.flightName = currentFlight.flightNm;
+                flightSelect.appendChild(currentOption);
+
+                data.forEach(item => {
+                    if(item.flightCode !== initialFlightCd) {
+                        const option = document.createElement('option');
+                        option.value = item.flightCode;
+                        option.textContent = item.flightCode;
+                        option.dataset.flightName = item.flightName;
+                        flightSelect.appendChild(option);
+                    }
+                });
+                flightSelect.disabled = false;
+
+                const changeEvent = new Event('change');
+                flightSelect.dispatchEvent(changeEvent);
+            })
+            .catch(error => console.error('Error loading flight codes:', error));
+    }
+
+    function resetSelect(select, defaultText) {
+        select.innerHTML = `<option value="">${defaultText}</option>`;
+        select.disabled = true;
+    }
+    /*]]>*/
+</script>
+</body>
+</html>
