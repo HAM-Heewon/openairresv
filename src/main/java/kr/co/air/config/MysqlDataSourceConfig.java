@@ -39,46 +39,6 @@ public class MysqlDataSourceConfig {
 	        this.applicationContext = applicationContext;
 	    }
 	    
-	    /*
-	    @Bean(name = "Mysql") // @Qualifier("Mysql")과 일치하도록 이름 지정
-	    public DataSource mysqlDataSource() { // 메서드 이름은 상관없지만, 헷갈리지 않게 변경
-	        return DataSourceBuilder.create()
-	                .driverClassName(driverClassName)
-	                .url(url)
-	                .username(username)
-	                .password(password)
-	                .build();
-	    }
-	  
-	    
-	    
-	 // 2. SqlSessionFactory 빈 정의
-	    @Bean(name = "sqlfactory2") // SqlSessionFactory 빈 이름은 "sqlfactory2"로 유지
-	    public SqlSessionFactory sqlfactory(@Qualifier("Mysql") DataSource ds, ApplicationContext ac) throws Exception {
-	        SqlSessionFactoryBean sqlf = new SqlSessionFactoryBean();
-	        sqlf.setDataSource(ds);
-	        sqlf.setMapperLocations(ac.getResources("classpath:/mapper/*.xml")); // mapper 파일 위치는 application.properties에서 mybatis.mapper-locations에 설정된 대로
-	        
-	        sqlf.setTypeAliasesPackage("kr.co.air.dtos"); 
-	         
-
-	        return sqlf.getObject();
-	    }
-
-	    // 3. SqlSessionTemplate 빈 정의
-	    @Bean(name = "sqltemplate2") // SqlSessionTemplate 빈 이름은 "sqltemplate2"로 유지
-	    public SqlSessionTemplate sqltemplate(@Qualifier("sqlfactory2") SqlSessionFactory sf) throws Exception {
-	        SqlSessionTemplate stp = new SqlSessionTemplate(sf);
-	        return stp;
-	    }
-	    
-	    // (선택 사항) JdbcTemplate 빈 정의 - TestController에서 사용한다면 필요
-	    @Bean(name = "mysqlJdbcTemplate") // TestController에서 이 빈 이름으로 Qualifier 사용
-	    public JdbcTemplate mysqlJdbcTemplate(@Qualifier("Mysql") DataSource ds) {
-	        return new JdbcTemplate(ds);
-	    }
-	    */
-	    
 	    @Bean(name = "MariaDB") // @Qualifier("MariaDB")과 일치하도록 이름 지정
 	    public DataSource mariadbDataSource() {
 	        return DataSourceBuilder.create()
@@ -89,11 +49,11 @@ public class MysqlDataSourceConfig {
 	                .build();
 	    }
 	 // 2. SqlSessionFactory 빈 정의
-	    @Bean(name = "sqlfactory2") // SqlSessionFactory 빈 이름은 "sqlfactory2"로 유지
+	    @Bean(name = "sqlfactory2")
 	    public SqlSessionFactory sqlfactory(@Qualifier("MariaDB") DataSource ds, ApplicationContext ac) throws Exception {
 	        SqlSessionFactoryBean sqlf = new SqlSessionFactoryBean();
 	        sqlf.setDataSource(ds);
-	        sqlf.setMapperLocations(ac.getResources("classpath:/mapper/*.xml")); // mapper 파일 위치
+	        sqlf.setMapperLocations(ac.getResources("classpath:/mapper/*.xml")); 
 	        
 	        sqlf.setTypeAliasesPackage("kr.co.air.dtos"); 
 	         
@@ -101,14 +61,14 @@ public class MysqlDataSourceConfig {
 	    }
 	    
 	    // 3. SqlSessionTemplate 빈 정의
-	    @Bean(name = "sqltemplate2") // SqlSessionTemplate 빈 이름은 "sqltemplate2"로 유지
+	    @Bean(name = "sqltemplate2") 
 	    public SqlSessionTemplate sqltemplate(@Qualifier("sqlfactory2") SqlSessionFactory sf) throws Exception {
 	        SqlSessionTemplate stp = new SqlSessionTemplate(sf);
 	        return stp;
 	    }
 	    
-	    // (선택 사항) JdbcTemplate 빈 정의 - TestController에서 사용한다면 필요
-	    @Bean(name = "mariadbJdbcTemplate") // TestController에서 이 빈 이름으로 Qualifier 사용
+	    //test
+	    @Bean(name = "mariadbJdbcTemplate") 
 	    public JdbcTemplate mariadbJdbcTemplate(@Qualifier("MariaDB") DataSource ds) {
 	        return new JdbcTemplate(ds);
 	    }

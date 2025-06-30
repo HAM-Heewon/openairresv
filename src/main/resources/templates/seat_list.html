@@ -9,8 +9,8 @@
 </head>
 <body>
     <div class="container">
-        <div th:replace="~{admin_header :: header}"></div>
-        <div th:replace="~{admin_menu :: menu}"></div>
+        <div th:replace="~{~{admin_header :: header}}"></div>
+        <div th:replace="~{~{admin_menu :: menu}}"></div>
         
         <div class="content">
             <h2 class="section-title">좌석 및 예약관리</h2>
@@ -90,7 +90,7 @@
             </div>
         </div>
     </div>
-<div th:replace="~{admin_footer :: footer}"></div>
+<div th:replace="~{~{admin_footer :: footer}}"></div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
