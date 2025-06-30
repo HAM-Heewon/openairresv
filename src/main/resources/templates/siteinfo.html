@@ -255,8 +255,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const currentPath = window.location.pathname;
     const menuItems = document.querySelectorAll('.menu-item');
     
-    console.log('Current path:', currentPath);
-    
     // 모든 메뉴에서 active 클래스 제거
     menuItems.forEach(item => {
         item.classList.remove('active');
@@ -268,7 +266,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (href === currentPath || href === '/siteinfo') {
             item.classList.add('active');
-            console.log('✅ Active menu set for:', href);
         }
     });
 });

@@ -36,7 +36,7 @@ public class UserController {
                 session.removeAttribute("loginError"); // 사용 후 제거
             }
         }
-        return "login";
+        return "Login";
     }
 
     @GetMapping("/admin_list")

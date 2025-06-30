@@ -169,7 +169,6 @@ function resv_cancel() {
     }
     
     const resvIds = Array.from(checkedBoxes).map(checkbox => parseInt(checkbox.dataset.id));
-    console.log('전송될 예약 ID:', resvIds);
     fetch('/ticket/cancel', {
         method: 'POST',
         headers: {

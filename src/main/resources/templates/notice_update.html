@@ -54,7 +54,7 @@
                             <div class="file-container">
                                 <div class="existing-file" th:if="*{fileName != null}">
                                     <span>기존 파일: </span>
-                                    <a th:href="@{/download/{savename}(savename=*{fileSavename})}" th:text="*{fileName}"></a>
+                                    <a th:href="@{/notice/download/{eno}(eno=*{eno})}" th:text="*{fileName}"></a>
                                 </div>
                                 <input type="file" name="mFile" class="file-input">
                                 <span class="file-info">※ 첨부파일 최대 용량은 2MB 입니다.</span>

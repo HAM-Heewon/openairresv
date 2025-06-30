@@ -102,7 +102,7 @@ public class NoticeController {
         return "redirect:/notice/" + dto.getEno(); 
     }
     
-    //공지사항 파일 다운로드
+  //공지사항 파일 다운로드
     @GetMapping("/notice/download/{eno}")
     public ResponseEntity<Resource> downloadFile(@PathVariable("eno") int eno) {
         DatalistDto notice = service.getNoticeForUpdate(eno); // 상세 정보 조회 (조회수 증가시키지 않는 메서드)
@@ -119,11 +119,11 @@ public class NoticeController {
         try {
             // FtpService에서 직접 스트리밍 가능한 Resource를 받아옴
             Resource resource = ftpService.downloadFileAsResource(remoteFilePath);
-            if (resource == null) {
-                // FtpService에서 이미 오류 로깅이 되었을 것이므로 여기서는 간단히 처리
-                logger.error("FTP 서버로부터 파일 스트리밍 리소스를 얻는 데 실패했습니다. ENO: {}", eno); // 로그 추가
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            if (resource == null || !resource.exists()) {
+                logger.error("SFTP 서버로부터 파일을 다운로드할 수 없습니다. ENO: {}, Path: {}", eno, remoteFilePath);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
+            
             // 파일명 URL 인코딩
             String encodedFileName = URLEncoder.encode(originalFileName, "UTF-8").replaceAll("\\+", "%20");
 
@@ -133,7 +133,10 @@ public class NoticeController {
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"")
                     .body(resource);
         } catch (IOException e) {
-            logger.error("파일 다운로드 중 IO 오류 발생 (ENO: {}): {}", eno, e.getMessage(), e); // logger 대신 log 사용
+            logger.error("파일 다운로드 중 IO 오류 발생 (ENO: {}): {}", eno, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        } catch (Exception e) {
+            logger.error("파일 다운로드 중 예상치 못한 오류 발생 (ENO: {}): {}", eno, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }

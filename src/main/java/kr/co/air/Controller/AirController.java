@@ -8,15 +8,11 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequiredArgsConstructor
 public class AirController {
-    
-    
+
 	
     @GetMapping("/")
     public String home() {
-    	return "/Login";
+    	return "redirect:/Login";
     }
-
-
-
-
+	
 }
