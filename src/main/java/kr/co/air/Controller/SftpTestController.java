@@ -54,11 +54,11 @@ public class SftpTestController {
             if (success) {
                 return "✅ SFTP 연결 성공! 테스트 파일 업로드 완료: " + testFileName;
             } else {
-                log.error("SFTP 연결 테스트 실패");
+                //log.error("SFTP 연결 테스트 실패");
                 return "❌ SFTP 연결 실패! 로그를 확인하세요.";
             }
         } catch (Exception e) {
-            log.error("SFTP 연결 테스트 중 오류: {}", e.getMessage(), e);
+            //log.error("SFTP 연결 테스트 중 오류: {}", e.getMessage(), e);
             return "❌ SFTP 연결 오류: " + e.getMessage();
         }
     }
@@ -80,14 +80,14 @@ public class SftpTestController {
             boolean success = ftpService.uploadFileFromStream(file.getInputStream(), testFileName);
             
             if (success) {
-                log.info("SFTP 파일 업로드 테스트 성공: {}", testFileName);
+                //log.info("SFTP 파일 업로드 테스트 성공: {}", testFileName);
                 return "✅ 파일 업로드 성공! " + testFileName + " (크기: " + file.getSize() + " bytes)";
             } else {
-                log.error("SFTP 파일 업로드 테스트 실패: {}", originalFileName);
+                //log.error("SFTP 파일 업로드 테스트 실패: {}", originalFileName);
                 return "❌ 파일 업로드 실패! 로그를 확인하세요.";
             }
         } catch (IOException e) {
-            log.error("파일 업로드 테스트 중 오류: {}", e.getMessage(), e);
+            //log.error("파일 업로드 테스트 중 오류: {}", e.getMessage(), e);
             return "❌ 파일 업로드 오류: " + e.getMessage();
         }
     }
@@ -102,17 +102,17 @@ public class SftpTestController {
             Resource resource = ftpService.downloadFileAsResource(filePath);
             
             if (resource != null && resource.exists()) {
-                log.info("SFTP 파일 다운로드 테스트 성공: {}", filePath);
+                //log.info("SFTP 파일 다운로드 테스트 성공: {}", filePath);
                 return ResponseEntity.ok()
                         .contentType(MediaType.APPLICATION_OCTET_STREAM)
                         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"downloaded_" + System.currentTimeMillis() + ".txt\"")
                         .body(resource);
             } else {
-                log.error("SFTP 파일 다운로드 테스트 실패: 파일 없음 - {}", filePath);
+                //log.error("SFTP 파일 다운로드 테스트 실패: 파일 없음 - {}", filePath);
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
-            log.error("파일 다운로드 테스트 중 오류: {}", e.getMessage(), e);
+            //log.error("파일 다운로드 테스트 중 오류: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -127,14 +127,14 @@ public class SftpTestController {
             boolean success = ftpService.deleteFile(filePath);
             
             if (success) {
-                log.info("SFTP 파일 삭제 테스트 성공: {}", filePath);
+                //log.info("SFTP 파일 삭제 테스트 성공: {}", filePath);
                 return "✅ 파일 삭제 성공! " + filePath;
             } else {
-                log.error("SFTP 파일 삭제 테스트 실패: {}", filePath);
+                //log.error("SFTP 파일 삭제 테스트 실패: {}", filePath);
                 return "❌ 파일 삭제 실패! 파일이 존재하지 않거나 권한이 없습니다.";
             }
         } catch (Exception e) {
-            log.error("파일 삭제 테스트 중 오류: {}", e.getMessage(), e);
+            //log.error("파일 삭제 테스트 중 오류: {}", e.getMessage(), e);
             return "❌ 파일 삭제 오류: " + e.getMessage();
         }
     }

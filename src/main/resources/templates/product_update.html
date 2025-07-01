@@ -238,8 +238,8 @@
             location.href = '/product_list';
         })
         .catch(error => {
-            console.error('Error:', error);
-            alert('오류: ' + error.message);
+            
+            alert('오류');
         });
     }
     
@@ -305,7 +305,7 @@
                 airlineSelect.disabled = false;
                 if(callback) callback();
             })
-            .catch(error => console.error('Error loading airlines:', error));
+            .catch(error => {});
     }
 
     function loadFlightCodes(airportCode, airlineName) {
@@ -339,7 +339,7 @@
                 const changeEvent = new Event('change');
                 flightSelect.dispatchEvent(changeEvent);
             })
-            .catch(error => console.error('Error loading flight codes:', error));
+            .catch(error => {});
     }
 
     function resetSelect(select, defaultText) {

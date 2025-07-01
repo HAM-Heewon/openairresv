@@ -31,7 +31,7 @@ public class TicketServiceImpl implements TicketService{
             return result;
             
         } catch (Exception e) {
-            log.error("findReservation 실행 중 오류", e);
+            //log.error("findReservation 실행 중 오류", e);
             throw e;
         }
     }

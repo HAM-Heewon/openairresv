@@ -152,7 +152,7 @@ function checkDuplicate() {
             }
         })
         .catch(error => {
-            console.error('중복 확인 중 오류 발생:', error);
+            
             alert('중복 확인 중 오류가 발생했습니다. 다시 시도해 주세요.');
         });
 }
@@ -221,7 +221,7 @@ function submitForm(event) {
             location.href = '/code_list'; 
         })
         .catch(error => {
-            console.error('항공 코드 생성 중 오류 발생:', error);
+            
             alert(error.message || '항공 코드 생성 중 오류가 발생했습니다.');
         });
     }

@@ -78,9 +78,9 @@ public class NoticeService {
                     }
                     dto.setFilePath(fullPathForDb + relativeRemotePath); // DB에 저장될 전체 경로
                     dto.setFileSize(mFile.getSize());
-                    log.info("SFTP 서버에 파일 업로드 성공 및 DB 정보 설정 완료: {}", dto.getFilePath());
+                    //log.info("SFTP 서버에 파일 업로드 성공 및 DB 정보 설정 완료: {}", dto.getFilePath());
                 } else {
-                    log.error("SFTP 파일 업로드 실패: {}", originalFileName);
+                    //log.error("SFTP 파일 업로드 실패: {}", originalFileName);
                     dto.setFileName(null);
                     dto.setFileSavename(null);
                     dto.setFilePath(null);
@@ -88,13 +88,13 @@ public class NoticeService {
                 }
 
             } catch (IOException e) {
-                log.error("파일 업로드 처리 중 IO 오류 발생: {}", e.getMessage(), e);
+                //log.error("파일 업로드 처리 중 IO 오류 발생: {}", e.getMessage(), e);
                 dto.setFileName(null);
                 dto.setFileSavename(null);
                 dto.setFilePath(null);
                 dto.setFileSize(0L);
             } catch (Exception e) {
-                log.error("SFTP 파일 처리 중 예상치 못한 오류 발생: {}", e.getMessage(), e);
+                //log.error("SFTP 파일 처리 중 예상치 못한 오류 발생: {}", e.getMessage(), e);
                 dto.setFileName(null);
                 dto.setFileSavename(null);
                 dto.setFilePath(null);
@@ -137,9 +137,9 @@ public class NoticeService {
                      // filePath는 DB에 baseDirectory 포함된 전체 경로로 저장되어 있으므로, FtpService에서 상대 경로로 변환하여 삭제합니다.
                      boolean deleteSuccess = ftpService.deleteFile(existingNotice.getFilePath());
                      if (deleteSuccess) {
-                         log.info("기존 SFTP 파일 삭제 성공: {}", existingNotice.getFilePath());
+                         //log.info("기존 SFTP 파일 삭제 성공: {}", existingNotice.getFilePath());
                      } else {
-                         log.warn("기존 SFTP 파일 삭제 실패 또는 파일 없음: {}", existingNotice.getFilePath());
+                         //log.warn("기존 SFTP 파일 삭제 실패 또는 파일 없음: {}", existingNotice.getFilePath());
                      }
                  }
 
@@ -164,9 +164,9 @@ public class NoticeService {
                      }
                      dto.setFilePath(fullPathForDb + relativeRemotePath);
                      dto.setFileSize(mFile.getSize());
-                     log.info("파일 수정 시 새 파일 SFTP 업로드 성공 및 DB 정보 설정 완료: {}", dto.getFilePath());
+                     //log.info("파일 수정 시 새 파일 SFTP 업로드 성공 및 DB 정보 설정 완료: {}", dto.getFilePath());
                  } else {
-                     log.error("파일 수정 시 새 파일 SFTP 업로드 실패: {}", originalFileName);
+                     //log.error("파일 수정 시 새 파일 SFTP 업로드 실패: {}", originalFileName);
                      // 업로드 실패 시 기존 파일 정보 유지 또는 null 처리
                      dto.setFileName(existingNotice.getFileName());
                      dto.setFileSavename(existingNotice.getFileSavename());
@@ -175,13 +175,13 @@ public class NoticeService {
                  }
 
              } catch (IOException e) {
-                 log.error("파일 수정 처리 중 IO 오류 발생: {}", e.getMessage(), e);
+                 //log.error("파일 수정 처리 중 IO 오류 발생: {}", e.getMessage(), e);
                  dto.setFileName(existingNotice.getFileName());
                  dto.setFileSavename(existingNotice.getFileSavename());
                  dto.setFilePath(existingNotice.getFilePath());
                  dto.setFileSize(existingNotice.getFileSize());
              } catch (Exception e) {
-                 log.error("파일 수정 중 SFTP 처리 오류: {}", e.getMessage(), e);
+                 //log.error("파일 수정 중 SFTP 처리 오류: {}", e.getMessage(), e);
                  dto.setFileName(existingNotice.getFileName());
                  dto.setFileSavename(existingNotice.getFileSavename());
                  dto.setFilePath(existingNotice.getFilePath());
@@ -209,12 +209,12 @@ public class NoticeService {
                         // DB에 저장된 filePath는 baseDirectory 포함된 전체 경로이므로, FtpService에서 상대 경로로 변환하여 삭제
                         boolean deleteSuccess = ftpService.deleteFile(notice.getFilePath());
                         if (deleteSuccess) {
-                            log.info("SFTP 파일 삭제 성공: {}", notice.getFilePath());
+                            //log.info("SFTP 파일 삭제 성공: {}", notice.getFilePath());
                         } else {
-                            log.warn("SFTP 파일 삭제 실패 또는 파일 없음: {}", notice.getFilePath());
+                            //log.warn("SFTP 파일 삭제 실패 또는 파일 없음: {}", notice.getFilePath());
                         }
                     } catch (Exception e) {
-                        log.error("SFTP 파일 삭제 중 오류 발생 (ENO: {}, Path: {}): {}", notice.getEno(), notice.getFilePath(), e.getMessage(), e);
+                        //log.error("SFTP 파일 삭제 중 오류 발생 (ENO: {}, Path: {}): {}", notice.getEno(), notice.getFilePath(), e.getMessage(), e);
                     }
                 }
             }

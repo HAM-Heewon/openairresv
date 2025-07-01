@@ -115,8 +115,8 @@ function searchReservations() {
             updateTable(data); // 검색 결과로 테이블 업데이트
         })
         .catch(error => {
-            console.error('검색 실패:', error);
-            alert('검색에 실패했습니다: ' + error.message);
+            
+            alert('검색에 실패했습니다.');
         });
 }
 
@@ -187,8 +187,8 @@ function resv_cancel() {
         searchReservations(); // 취소 후 현재 검색 조건으로 테이블 새로고침
     })
     .catch(error => {
-        console.error('취소 실패:', error);
-        alert('예매 취소에 실패했습니다: ' + error.message);
+        
+        alert('예매 취소에 실패했습니다.');
     });
 }
 </script>

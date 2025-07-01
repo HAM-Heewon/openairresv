@@ -108,21 +108,19 @@ function deleteNotice(eno) {
             if (!response.ok) {
                 // 서버에서 에러 메시지를 보냈을 경우
                 return response.text().then(text => {
-                    console.error("서버 응답 오류:", text); // 콘솔에 오류 내용 출력
                     throw new Error(text);
                 });
             }
-            // 성공적으로 삭제되었을 경우, 서버에서 보낸 메시지를 받음
-            return response.text(); // 서버는 이제 메시지를 반환합니다.
+            
+            return response.text(); 
         })
         .then(data => {
-            // data 변수에 서버에서 보낸 성공 메시지 ("X번 공지사항이 삭제되었습니다.")가 담깁니다.
-            alert(data); // 성공 메시지를 alert로 출력
-            location.href = '/notice'; // 메시지 확인 후 /notice 페이지로 이동
+            
+            alert(data);
+            location.href = '/notice'; 
         })
         .catch(error => {
-            console.error("Fetch 오류:", error); // 콘솔에 fetch 오류 출력
-            alert(error.message); // 실패 메시지 출력
+            alert("Fetch 오류");
         });
     }
 }

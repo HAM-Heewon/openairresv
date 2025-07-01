@@ -33,7 +33,7 @@ public class FtpService {
             Session session = jsch.getSession(sftpConfig.getUsername(), sftpConfig.getHost(), sftpConfig.getPort());
             
             if (sftpConfig.getPrivateKeyPath() != null) {
-                log.info("설정된 SSH 키 경로: {}", sftpConfig.getPrivateKeyPath());
+                //log.info("설정된 SSH 키 경로: {}", sftpConfig.getPrivateKeyPath());
             }
 
             // SSH 키 파일이 있는 경우 (SSH 키 우선)
@@ -43,19 +43,19 @@ public class FtpService {
                     .replace("\\", "/")  // 백슬래시를 슬래시로 변환
                     .replaceAll("/+", "/");  // 중복 슬래시 제거
               
-                log.info("정규화된 SSH 키 파일 경로: {}", normalizedPath);
+                //log.info("정규화된 SSH 키 파일 경로: {}", normalizedPath);
                 
                 // 파일 존재 여부 확인
                 java.io.File keyFile = new java.io.File(normalizedPath);
                 if (!keyFile.exists()) {
-                    log.error("SSH 키 파일을 찾을 수 없습니다: {}", normalizedPath);
-                    log.error("파일 존재 여부: {}", keyFile.exists());
-                    log.error("파일 절대 경로: {}", keyFile.getAbsolutePath());
+                    //log.error("SSH 키 파일을 찾을 수 없습니다: {}", normalizedPath);
+                    //log.error("파일 존재 여부: {}", keyFile.exists());
+                    //log.error("파일 절대 경로: {}", keyFile.getAbsolutePath());
                     return null;
                 }
                 
                 if (!keyFile.canRead()) {
-                    log.error("SSH 키 파일을 읽을 수 없습니다 (권한 문제): {}", normalizedPath);
+                    //log.error("SSH 키 파일을 읽을 수 없습니다 (권한 문제): {}", normalizedPath);
                     return null;
                 }
                 
@@ -81,7 +81,7 @@ public class FtpService {
             return channelSftp;
             
         } catch (Exception e) {
-            log.error("SFTP 연결 또는 로그인 중 오류 발생: {}", e.getMessage(), e);
+            //log.error("SFTP 연결 또는 로그인 중 오류 발생: {}", e.getMessage(), e);
             return null;
         }
     }
@@ -99,7 +99,7 @@ public class FtpService {
                 }
             }
         } catch (Exception e) {
-            log.error("SFTP 연결 해제 중 오류 발생: {}", e.getMessage(), e);
+            //log.error("SFTP 연결 해제 중 오류 발생: {}", e.getMessage(), e);
         }
     }
 
@@ -140,18 +140,18 @@ public class FtpService {
             // 대상 디렉토리로 이동하면서 없는 디렉토리 생성
             if (!targetDirectory.isEmpty()) {
                 if (!changeAndMakeDirectoryRecursive(channelSftp, targetDirectory)) {
-                     log.error("SFTP 파일 업로드: 원격 디렉토리 생성/이동 실패: {}", targetDirectory);
+                     //log.error("SFTP 파일 업로드: 원격 디렉토리 생성/이동 실패: {}", targetDirectory);
                      return false;
                 }
             }
 
             try (InputStream inputStream = new FileInputStream(localFilePath)) {
-                log.info("SFTP 파일 업로드 시도: 로컬 {} -> 원격 (현재 워킹 디렉토리 + {})", localFilePath, fileNameToStore);
+                //log.info("SFTP 파일 업로드 시도: 로컬 {} -> 원격 (현재 워킹 디렉토리 + {})", localFilePath, fileNameToStore);
                 channelSftp.put(inputStream, fileNameToStore);
                 return true;
             }
         } catch (Exception e) {
-            log.error("SFTP 파일 업로드 중 오류 발생: {}", e.getMessage(), e);
+            //log.error("SFTP 파일 업로드 중 오류 발생: {}", e.getMessage(), e);
             return false;
         } finally {
             disconnect(channelSftp);
@@ -194,17 +194,17 @@ public class FtpService {
             // 대상 디렉토리로 이동하면서 없는 디렉토리 생성
             if (!targetDirectory.isEmpty()) {
                 if (!changeAndMakeDirectoryRecursive(channelSftp, targetDirectory)) {
-                     log.error("SFTP 파일 업로드: 원격 디렉토리 생성/이동 실패: {}", targetDirectory);
+                     //log.error("SFTP 파일 업로드: 원격 디렉토리 생성/이동 실패: {}", targetDirectory);
                      return false;
                 }
             }
 
-            log.info("SFTP 파일 업로드 시도: 스트림 -> 원격 (현재 워킹 디렉토리 + {})", fileNameToStore);
+            //log.info("SFTP 파일 업로드 시도: 스트림 -> 원격 (현재 워킹 디렉토리 + {})", fileNameToStore);
             channelSftp.put(inputStream, fileNameToStore);
             return true;
             
         } catch (Exception e) {
-            log.error("SFTP 파일 업로드 중 오류 발생: {}", e.getMessage(), e);
+            //log.error("SFTP 파일 업로드 중 오류 발생: {}", e.getMessage(), e);
             return false;
         } finally {
             disconnect(channelSftp);
@@ -225,12 +225,12 @@ public class FtpService {
             // 입력된 경로가 이미 상대 경로인 경우 그대로 사용
             if (!remoteFilePath.startsWith("/")) {
                 relativeRemotePath = remoteFilePath;
-                log.info("상대 경로로 입력됨: {}", relativeRemotePath);
+                //log.info("상대 경로로 입력됨: {}", relativeRemotePath);
             } else {
                 // 전체 경로인 경우 상대 경로로 변환
                 relativeRemotePath = getRelativePath(remoteFilePath, baseDir);
                 if (relativeRemotePath == null) {
-                    log.error("다운로드할 파일의 경로가 SFTP baseDirectory '{}' 내에 있지 않습니다: {}", baseDir, remoteFilePath);
+                    //log.error("다운로드할 파일의 경로가 SFTP baseDirectory '{}' 내에 있지 않습니다: {}", baseDir, remoteFilePath);
                     return null;
                 }
             }
@@ -247,11 +247,11 @@ public class FtpService {
             inputStream = channelSftp.get(relativeRemotePath);
 
             if (inputStream == null) {
-                log.error("SFTP 스트림 다운로드 실패: 파일 {}", relativeRemotePath);
+                //log.error("SFTP 스트림 다운로드 실패: 파일 {}", relativeRemotePath);
                 return null;
             }
 
-            log.info("SFTP 파일 다운로드 시작 (메모리 로드): 원격 (baseDir + {})", relativeRemotePath);
+            //log.info("SFTP 파일 다운로드 시작 (메모리 로드): 원격 (baseDir + {})", relativeRemotePath);
 
             // 파일을 메모리로 모두 읽어옴
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -265,7 +265,7 @@ public class FtpService {
             return new ByteArrayResource(fileContent);
 
         } catch (Exception e) {
-            log.error("SFTP 파일 다운로드 중 오류 발생: {}", e.getMessage(), e);
+            //log.error("SFTP 파일 다운로드 중 오류 발생: {}", e.getMessage(), e);
             return null;
         } finally {
             try {
@@ -273,7 +273,7 @@ public class FtpService {
                     inputStream.close();
                 }
             } catch (IOException e) {
-                log.error("InputStream 닫기 중 오류 발생: {}", e.getMessage(), e);
+                //log.error("InputStream 닫기 중 오류 발생: {}", e.getMessage(), e);
             }
             disconnect(channelSftp);
         }
@@ -307,7 +307,7 @@ public class FtpService {
             // 4차: 절대 경로를 상대 경로로 변환
             else {
                 relativeRemotePath = remoteFilePath.startsWith("/") ? remoteFilePath.substring(1) : remoteFilePath;
-                log.info("절대 경로를 상대 경로로 변환: {} -> {}", remoteFilePath, relativeRemotePath);
+                //log.info("절대 경로를 상대 경로로 변환: {} -> {}", remoteFilePath, relativeRemotePath);
             }
 
             // base directory로 이동
@@ -319,10 +319,10 @@ public class FtpService {
                 }
             }
             channelSftp.rm(relativeRemotePath);
-            log.info("SFTP 파일 삭제 성공: {}", relativeRemotePath);
+            //log.info("SFTP 파일 삭제 성공: {}", relativeRemotePath);
             return true;
         } catch (Exception e) {
-            log.error("SFTP 파일 삭제 중 오류 발생: {}", e.getMessage(), e);
+            //log.error("SFTP 파일 삭제 중 오류 발생: {}", e.getMessage(), e);
             return false;
         } finally {
             disconnect(channelSftp);
@@ -351,7 +351,7 @@ public class FtpService {
         } else if ("/".equals(normalizedBaseDir) && normalizedFullPath.startsWith("/")) {
             return normalizedFullPath.substring(1);
         }
-        log.warn("SFTP 경로 불일치: fullPath '{}'가 baseDirectory '{}' 내에 있지 않습니다.", fullPath, baseDir);
+        //log.warn("SFTP 경로 불일치: fullPath '{}'가 baseDirectory '{}' 내에 있지 않습니다.", fullPath, baseDir);
         return null;
     }
     
