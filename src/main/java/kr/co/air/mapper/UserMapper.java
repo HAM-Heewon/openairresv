@@ -24,5 +24,8 @@ public interface UserMapper {
 	
 	//공지사항 : 사용자이름으로 idx 조회
 	Long findAdIdx(String adminId);
+	
+	UsersDto findalldata(String adminId);
+	void updateMyAdmin(UsersDto dto);
 
 }

@@ -252,4 +252,9 @@ main{
     font-size: 18px;
     font-weight: 800;
     line-height: 55px;
+    border-radius: 5px;
+}
+.btn:hover{
+	cursor: pointer;
+	background-color: #e89c00;
 }

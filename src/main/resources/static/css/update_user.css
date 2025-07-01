@@ -1,0 +1,92 @@
+@charset "UTF-8";
+body {
+    font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #2c2c2c;
+    color: #e0e0e0; /* 밝은 회색으로 변경 */
+        display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #2c2c2c;
+    min-height: 100vh;
+        flex:1;
+}
+.update-form {
+    background-color: #3a3a3a; /* 테이블과 동일한 배경 */
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    max-width: 600px;
+    margin: 30px auto; /* 중앙 정렬 */
+    color: #e0e0e0;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #fff; /* 라벨 색상 흰색 */
+}
+
+.form-group input[type="text"],
+.form-group input[type="password"],
+.form-group input[type="email"],
+.form-group select {
+    width: calc(100% - 20px); /* 패딩 고려 */
+    padding: 10px;
+    border: 1px solid #555; /* 어두운 테두리 */
+    border-radius: 4px;
+    background-color: #454545; /* 입력 필드 배경 */
+    color: #e0e0e0; /* 입력 텍스트 색상 */
+    font-size: 14px;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="password"]:focus,
+.form-group input[type="email"]:focus,
+.form-group select:focus {
+    border-color: #ff6b6b; /* 포커스 시 강조 색상 */
+    outline: none;
+}
+.password-mismatch {
+    color: #f44336; /* 빨간색으로 표시 */
+    font-size: 12px;
+    margin-top: 5px;
+}
+.form-actions {
+    text-align: right;
+    margin-top: 30px;
+}
+
+.btn-submit {
+    background-color: #ff6b6b; /* 제출 버튼 색상 */
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.btn-submit:hover {
+    background-color: #e65c5c;
+}
+
+.error-message {
+    color: #f44336;
+    font-size: 12px;
+    margin-top: 5px;
+}

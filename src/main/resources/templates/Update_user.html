@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>개인정보 수정</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" type="text/css" th:href="@{/css/head_menu.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/css/update_user.css}">
+</head>
+<body>
+<div class="container">
+    <div th:replace="~{admin_header :: header}"></div>
+    
+    <div th:replace="~{admin_menu :: menu}"></div>
+    
+    <div class="content">
+        <h2 class="section-title">개인정보 수정</h2>
+
+        <form th:action="@{/myUpdate}" method="post" class="update-form" th:object="${adminInfo}" onsubmit="return validatePassword() && confirmUpdate()">
+            <input type="hidden" th:field="*{adIdx}" />
+
+            <div class="form-group">
+                <label for="adminId">아이디</label>
+                <input type="text" id="adminId" th:field="*{adminId}" readonly />
+            </div>
+
+            <div class="form-group">
+                <label for="adminNm">이름</label>
+                <input type="text" id="adminNm" th:field="*{adminNm}" required />
+            </div>
+
+            <div class="form-group">
+                <label for="adminPw">새 비밀번호</label>
+                <input type="password" id="adminPw" name="adminPw" placeholder="새 비밀번호를 입력해주세요 (변경시에만 입력)" />
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmAdminPw">새 비밀번호 확인</label>
+                <input type="password" id="confirmAdminPw" name="confirmAdminPw" placeholder="새 비밀번호를 다시 입력해주세요" />
+                <div id="passwordMismatchMessage" class="password-mismatch" style="display:none;">
+                    비밀번호가 일치하지 않습니다.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="adminTel">전화번호</label>
+                <input type="text" id="adminTel" th:field="*{adminTel}" required />
+            </div>
+
+            <div class="form-group">
+                <label for="adminEmail">이메일</label>
+                <input type="email" id="adminEmail" th:field="*{adminEmail}" required />
+            </div>
+
+            <div class="form-group">
+                <label for="department">부서</label>
+                <select id="department" th:field="*{department}" required>
+                    <option value="총무">총무</option>
+                    <option value="인사">인사</option>
+                    <option value="개발">개발</option>
+                    <option value="마케팅">마케팅</option>
+                </select>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">정보 수정</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+<div th:replace="~{admin_footer :: footer}"></div>
+<script>
+function validatePassword() {
+    const adminPw = document.getElementById('adminPw').value;
+    const confirmAdminPw = document.getElementById('confirmAdminPw').value;
+    const passwordMismatchMessage = document.getElementById('passwordMismatchMessage');
+
+    // 새 비밀번호 입력 칸 둘 중 하나라도 입력된 경우에만 검사 수행
+    if ((adminPw !== '' || confirmAdminPw !== '') && adminPw !== confirmAdminPw) {
+        passwordMismatchMessage.style.display = 'block'; // 메시지 표시
+        return false; // 유효성 검사 실패
+    } else {
+        passwordMismatchMessage.style.display = 'none'; // 메시지 숨김
+        return true; // 유효성 검사 성공
+    }
+}
+function confirmUpdate() {
+    return confirm('개인정보를 수정하시겠습니까?');
+}
+
+// 수정 성공/실패 메시지 표시
+document.addEventListener('DOMContentLoaded', function() {
+    var message = "[[${message}]]"; // 컨트롤러에서 전달된 성공 메시지
+    var error = "[[${error}]]";     // 컨트롤러에서 전달된 실패 메시지
+
+    if (message && message !== "") {
+        alert(message);
+    }
+    if (error && error !== "") {
+        alert(error);
+    }
+});
+</script>
+</body>
+</html>

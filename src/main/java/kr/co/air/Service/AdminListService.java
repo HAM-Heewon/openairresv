@@ -7,7 +7,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import kr.co.air.dtos.UsersDto;
 import kr.co.air.mapper.UserMapper;
@@ -17,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AdminListService {
 	private final UserMapper usermapper;
+	private final PasswordEncoder encoder;
 	private static final Logger logger = LoggerFactory.getLogger(AdminListService.class);
 	
     public Map<String, Object> getAdminPageData(Authentication auth) {
@@ -36,5 +39,26 @@ public class AdminListService {
         data.put("isTopLevelAdmin", isTopLevelAdmin);
 
         return data;
+    }
+    
+    public UsersDto getMyInfo(String adminId) {
+    	return usermapper.findalldata(adminId);
+    }
+    
+    @Transactional
+    public boolean updateMyInfo(UsersDto dto) {
+        if (dto.getAdminPw() != null && !dto.getAdminPw().isEmpty()) {
+            String encodedPassword = encoder.encode(dto.getAdminPw());
+            dto.setAdminPw(encodedPassword);
+        } else {
+            dto.setAdminPw(null);
+        }
+        try {
+        	usermapper.updateMyAdmin(dto);
+        	return true;
+        }catch (Exception e) {
+        	e.printStackTrace();
+        	return false;
+		}
     }
 }

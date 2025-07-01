@@ -2,13 +2,17 @@ package kr.co.air.Controller;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.security.Principal;
 import java.util.Map;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -56,6 +60,37 @@ public class UserController {
     @GetMapping("/add_master")
     public String addMasterPage() {
         return "add_master";
+    }
+    
+    @GetMapping("/myInfo")
+    public String getMyInfo(Principal principal, Model model) {
+
+        String adminId = principal.getName(); 
+
+        UsersDto adminInfo = adminListService.getMyInfo(adminId);
+        if (adminInfo == null) {
+            return "redirect:/admin_list";
+        }
+        model.addAttribute("adminInfo", adminInfo);
+        return "Update_user"; 
+    }
+
+    // POST 요청: 개인정보 수정 폼 제출을 처리
+    @PostMapping("/myUpdate")
+    public String updateMyInfo(@ModelAttribute UsersDto usersDto, RedirectAttributes redirectAttributes) {
+        // DTO 객체는 폼에서 제출된 데이터로 자동 바인딩됩니다.
+        // adminId는 폼의 hidden 필드나, Principal 객체에서 다시 가져오는 것을 고려할 수 있습니다.
+        // 여기서는 usersDto.getAdminId()를 사용합니다.
+
+        boolean success = adminListService.updateMyInfo(usersDto);
+
+        if (success) {
+            redirectAttributes.addFlashAttribute("message", "개인정보가 성공적으로 수정되었습니다.");
+            return "redirect:/myInfo"; 
+        } else {
+            redirectAttributes.addFlashAttribute("error", "개인정보 수정에 실패했습니다.");
+            return "redirect:/myInfo"; 
+        }
     }
 }
 	

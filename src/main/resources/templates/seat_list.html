@@ -171,37 +171,47 @@
     function regi_complete() {
         const rows = document.querySelectorAll('.data-row');
         const dataToSave = [];
-        let validationFailed = false;
+        const validationMessages = []; // 유효성 검사 실패 메시지를 모을 배열
 
-        rows.forEach(row => {
+        rows.forEach((row, index) => {
             const startDate = row.querySelector('.booking-start-date').value;
             const endDate = row.querySelector('.booking-end-date').value;
             const priceInput = row.querySelector('.price-per-person');
             const price = priceInput ? priceInput.value.replace(/[^0-9]/g, '') : '';
 
-            if (startDate || endDate || price) {
-                if (!startDate || !endDate || !price) {
-                    alert('예약 시작일, 종료일, 금액은 모두 함께 입력해야 합니다.');
-                    validationFailed = true; return;
-                }
-                if (new Date(startDate) > new Date(endDate)) {
-                    alert('예약 종료일은 시작일보다 빠를 수 없습니다.');
-                    validationFailed = true; return;
-                }
-                dataToSave.push({
-                    scheduleIdx: row.querySelector('.schedule-idx').value,
-                    seatTypeIdx: row.querySelector('.seat-type-idx').value,
-                    bookingStartDate: startDate,
-                    bookingEndDate: endDate,
-                    seatTypePrice: price
-                });
+            // 모든 필드가 비어있는 경우 (등록할 의도가 없는 경우)
+            if (!startDate && !endDate && !price) {
+                return; // 이 행은 건너뛰고 다음 행으로 넘어감
             }
+
+            // 하나라도 입력된 경우, 모든 필드가 입력되었는지 확인
+            if (!startDate || !endDate || !price) { // <-- 이 부분 수정: !endDate -> !(!endDate)
+                validationMessages.push(`${index + 1}번째 행: 예약 시작일, 종료일, 금액은 모두 함께 입력해야 합니다.`);
+                return; // 이 행은 건너뛰고 다음 행으로 넘어감
+            }
+
+            // 날짜 유효성 검사
+            if (new Date(startDate) > new Date(endDate)) {
+                validationMessages.push(`${index + 1}번째 행: 예약 종료일은 시작일보다 빠를 수 없습니다.`);
+                return; // 이 행은 건너뛰고 다음 행으로 넘어감
+            }
+
+            // 모든 유효성 검사를 통과한 경우에만 dataToSave에 추가
+            dataToSave.push({
+                scheduleIdx: row.querySelector('.schedule-idx').value,
+                seatTypeIdx: row.querySelector('.seat-type-idx').value,
+                bookingStartDate: startDate,
+                bookingEndDate: endDate,
+                pricePerPerson: price
+            });
         });
 
-        if (validationFailed) return;
-
         if (dataToSave.length === 0) {
-            alert('저장할 데이터를 최소 한 줄 이상 입력해주세요.');
+            let alertMessage = '저장할 유효한 데이터가 없습니다.';
+            if (validationMessages.length > 0) {
+                alertMessage += '\n\n다음과 같은 문제가 발견되어 데이터가 저장되지 않았습니다:\n\n' + validationMessages.join('\n');
+            }
+            alert(alertMessage);
             return;
         }
 
@@ -215,7 +225,8 @@
             return response.text();
         })
         .then(message => {
-            alert(message);
+            let successMessage = `총 ${dataToSave.length}개의 예약 설정이 등록되었습니다.`;
+            alert(successMessage);
             location.reload();
         })
         .catch(error => {

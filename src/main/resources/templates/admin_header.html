@@ -19,7 +19,7 @@
         <div class="header-right">
             <span style="color: #4CAF50; font-weight: bold;" sec:authentication="principal.usersDto.adminNm"></span>
             <span>님 환영합니다.</span> 
-            <a href="#">[개인정보 수정]</a> 
+            <a th:href="@{/myInfo}">[개인정보 수정]</a> 
 		    <form th:action="@{/logout}" method="post">
 		        <button type="submit" class="logout-btn" >[로그아웃]</button>
 		        <!-- 

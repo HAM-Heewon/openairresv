@@ -1,5 +1,6 @@
 package kr.co.air.dtos;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import lombok.Data;
@@ -11,7 +12,7 @@ public class ResvSettingDto {
     private int seatTypeIdx;
     private String seatTypeName;
     private int seatCount;
-    private long seatTypePrice;
+    private BigDecimal seatTypePrice;
     
     // FLIGHT_RESV_INFO 정보
     private LocalDate bookingStartDate;

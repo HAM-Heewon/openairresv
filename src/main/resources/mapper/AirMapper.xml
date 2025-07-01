@@ -66,4 +66,27 @@ ORDER BY AD_IDX DESC
     WHERE ADMIN_ID = #{adminId}
     LIMIT 1
 </select>
+
+<!-- 개인정보 수정 페이지 데이터 불러오기 -->
+<select id="findalldata" resultMap="adminUserResultMap">
+   SELECT
+        AD_IDX, ADMIN_ID, ADMIN_PW, ADMIN_NM, ADMIN_TEL,
+        ADMIN_EMAIL, DEPARTMENT, POSITION_CODE, POSITION_NAME , ADMIN_AGREE
+    FROM ADMIN_USERS
+    WHERE ADMIN_ID = #{adminId}
+</select>
+<!-- 개인정보 수정 -->
+<update id="updateMyAdmin" parameterType="kr.co.air.dtos.UsersDto">
+    UPDATE ADMIN_USERS
+    SET
+    ADMIN_NM = #{adminNm},
+    ADMIN_TEL  = #{adminTel},
+    ADMIN_EMAIL = #{adminEmail},
+    DEPARTMENT = #{department}
+    <if test="adminPw != null and adminPw != ''">
+        , ADMIN_PW = #{adminPw}
+    </if>
+    WHERE
+    ADMIN_ID = #{adminId}
+</update>
 </mapper>
