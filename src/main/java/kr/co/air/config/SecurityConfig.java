@@ -21,12 +21,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
         	.csrf(csrf -> csrf
-                .ignoringRequestMatchers("/air-faq/**")  // FAQ 관련 모든 경로 CSRF 제외
-                .disable()
+                .ignoringRequestMatchers("/air-faq/**") 
+                .ignoringRequestMatchers("/api/resv/**", "/air-faq/api/**")
             )
         	.formLogin(formLogin -> formLogin
                     .loginPage("/login")
-                    //.loginProcessingUrl("/login")  // 명시적으로 추가
                     .failureHandler(loginFailHandler)
                     .defaultSuccessUrl("/admin_list", true)
                     .permitAll()
@@ -37,9 +36,8 @@ public class SecurityConfig {
                     .invalidateHttpSession(true)
                 )
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/css/**", "/js/**", "/image/**", "/ico/**", "/static/**","/sftp-test/**").permitAll()
-                // 회원가입 페이지 경로와 아이디 중복확인 API 경로는 모두 허용
-                .requestMatchers("/","/index","/add_master", "/login", "/admin_req", "/admin/check_id", "/air-**", "/api/resv/**", "/ticket/**").permitAll()
+                .requestMatchers("/css/**", "/js/**", "/image/**", "/ico/**", "/static/**").permitAll()
+                .requestMatchers("/","/index","/add_master", "/login", "/admin_req", "/admin/check_id", "/air-**","/ticket/**").permitAll()
                 
                 .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/notice/delete/**").hasRole("관리자")
                 .requestMatchers("/admin_list").authenticated() 
@@ -51,6 +49,6 @@ public class SecurityConfig {
     
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(11);
     }
 }
